@@ -17,6 +17,11 @@
 		3D7A7DC023519E02002E8F02 /* GroupTournamentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7A7DBF23519E02002E8F02 /* GroupTournamentsViewController.swift */; };
 		3D7A7DC223519F29002E8F02 /* UserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7A7DC123519F29002E8F02 /* UserDefaultsKey.swift */; };
 		3D7A7DC423530B9D002E8F02 /* TournamentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7A7DC323530B9D002E8F02 /* TournamentViewCell.swift */; };
+		3D99E46823548A9C007D3897 /* TournamentNameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D99E46723548A9C007D3897 /* TournamentNameViewController.swift */; };
+		3D99E46B23548AEA007D3897 /* CreateTournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D99E46A23548AEA007D3897 /* CreateTournament.swift */; };
+		3D99E46D23548B69007D3897 /* TournamentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D99E46C23548B69007D3897 /* TournamentType.swift */; };
+		3D99E46F2354920F007D3897 /* SelectTournamentPlayersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D99E46E2354920F007D3897 /* SelectTournamentPlayersViewController.swift */; };
+		3D99E47123549530007D3897 /* PlayerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D99E47023549530007D3897 /* PlayerViewCell.swift */; };
 		3DBC3430234F47B20021909D /* GroupsViewVontroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC342F234F47B20021909D /* GroupsViewVontroller.swift */; };
 		3DBC3432234F4B170021909D /* GroupViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC3431234F4B170021909D /* GroupViewCell.swift */; };
 		3DBC3434234F4E8F0021909D /* DatabaseFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC3433234F4E8F0021909D /* DatabaseFields.swift */; };
@@ -40,6 +45,11 @@
 		3D7A7DBF23519E02002E8F02 /* GroupTournamentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTournamentsViewController.swift; sourceTree = "<group>"; };
 		3D7A7DC123519F29002E8F02 /* UserDefaultsKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKey.swift; sourceTree = "<group>"; };
 		3D7A7DC323530B9D002E8F02 /* TournamentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentViewCell.swift; sourceTree = "<group>"; };
+		3D99E46723548A9C007D3897 /* TournamentNameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TournamentNameViewController.swift; path = "../../../../FoosTourney/foostourney/Controller/Create Tournament/TournamentNameViewController.swift"; sourceTree = "<group>"; };
+		3D99E46A23548AEA007D3897 /* CreateTournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CreateTournament.swift; path = "../../../../FoosTourney/foostourney/Model/Create Tournament/CreateTournament.swift"; sourceTree = "<group>"; };
+		3D99E46C23548B69007D3897 /* TournamentType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TournamentType.swift; path = ../../../FoosTourney/foostourney/Model/TournamentType.swift; sourceTree = "<group>"; };
+		3D99E46E2354920F007D3897 /* SelectTournamentPlayersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SelectTournamentPlayersViewController.swift; path = "../../../../FoosTourney/foostourney/Controller/Create Tournament/SelectTournamentPlayersViewController.swift"; sourceTree = "<group>"; };
+		3D99E47023549530007D3897 /* PlayerViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PlayerViewCell.swift; path = "../../../../FoosTourney/foostourney/Controller/Create Tournament/PlayerViewCell.swift"; sourceTree = "<group>"; };
 		3DBC342F234F47B20021909D /* GroupsViewVontroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupsViewVontroller.swift; sourceTree = "<group>"; };
 		3DBC3431234F4B170021909D /* GroupViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewCell.swift; sourceTree = "<group>"; };
 		3DBC3433234F4E8F0021909D /* DatabaseFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseFields.swift; sourceTree = "<group>"; };
@@ -104,8 +114,10 @@
 		3D29A92A234CA7EC008858B9 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				3D99E46923548ACC007D3897 /* Create Tournament */,
 				3DBC3433234F4E8F0021909D /* DatabaseFields.swift */,
 				3D7A7DC123519F29002E8F02 /* UserDefaultsKey.swift */,
+				3D99E46C23548B69007D3897 /* TournamentType.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -124,6 +136,7 @@
 		3D29A92C234CA7FC008858B9 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				3D99E46623548A60007D3897 /* Create Tournament */,
 				3D29A91A234CA6EB008858B9 /* HomeTabViewController.swift */,
 				3DBC342F234F47B20021909D /* GroupsViewVontroller.swift */,
 				3DBC3431234F4B170021909D /* GroupViewCell.swift */,
@@ -134,6 +147,24 @@
 				3D7A7DC323530B9D002E8F02 /* TournamentViewCell.swift */,
 			);
 			path = Controller;
+			sourceTree = "<group>";
+		};
+		3D99E46623548A60007D3897 /* Create Tournament */ = {
+			isa = PBXGroup;
+			children = (
+				3D99E46723548A9C007D3897 /* TournamentNameViewController.swift */,
+				3D99E46E2354920F007D3897 /* SelectTournamentPlayersViewController.swift */,
+				3D99E47023549530007D3897 /* PlayerViewCell.swift */,
+			);
+			path = "Create Tournament";
+			sourceTree = "<group>";
+		};
+		3D99E46923548ACC007D3897 /* Create Tournament */ = {
+			isa = PBXGroup;
+			children = (
+				3D99E46A23548AEA007D3897 /* CreateTournament.swift */,
+			);
+			path = "Create Tournament";
 			sourceTree = "<group>";
 		};
 		71BDF4C34BD8DD89DF9C8397 /* Pods */ = {
@@ -280,16 +311,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D7A7DBE235198A2002E8F02 /* ChooseGroupViewController.swift in Sources */,
+				3D99E47123549530007D3897 /* PlayerViewCell.swift in Sources */,
 				3DBC3434234F4E8F0021909D /* DatabaseFields.swift in Sources */,
+				3D99E46F2354920F007D3897 /* SelectTournamentPlayersViewController.swift in Sources */,
 				3DBC3438234F62760021909D /* UICollectionView+Extension.swift in Sources */,
 				3D7A7DC023519E02002E8F02 /* GroupTournamentsViewController.swift in Sources */,
 				3DBC343A234F68980021909D /* CreateGroupViewController.swift in Sources */,
 				3DBC3436234F599A0021909D /* UIColor+Extension.swift in Sources */,
 				3D29A91B234CA6EB008858B9 /* HomeTabViewController.swift in Sources */,
+				3D99E46D23548B69007D3897 /* TournamentType.swift in Sources */,
 				3D29A917234CA6EB008858B9 /* AppDelegate.swift in Sources */,
 				3DBC3432234F4B170021909D /* GroupViewCell.swift in Sources */,
 				3DBC3430234F47B20021909D /* GroupsViewVontroller.swift in Sources */,
 				3D7A7DC223519F29002E8F02 /* UserDefaultsKey.swift in Sources */,
+				3D99E46823548A9C007D3897 /* TournamentNameViewController.swift in Sources */,
+				3D99E46B23548AEA007D3897 /* CreateTournament.swift in Sources */,
 				3D7A7DC423530B9D002E8F02 /* TournamentViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

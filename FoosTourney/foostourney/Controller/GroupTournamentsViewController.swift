@@ -18,6 +18,7 @@ class GroupTournamentsViewController: UIViewController {
     fileprivate var _refHandle: DatabaseHandle!
     
     var tournaments: [DataSnapshot]! = []
+    var currentSelectedGroupId: String?
     
     override func viewDidLoad() {
         configureDatabase()
@@ -32,10 +33,11 @@ class GroupTournamentsViewController: UIViewController {
     func checkGroupSelected() {
         if let userGroupDict = UserDefaults.standard.dictionary(forKey: UserDefaultsKey.userGroupDict) {
             if let currentUserGroupSelected = userGroupDict[Auth.auth().currentUser?.uid ?? ""] {
+                currentSelectedGroupId = currentUserGroupSelected as! String
                 // Let's fetch the selected group tournaments.
-                showGroupTournaments(currentUserGroupSelected as! String)
+                showGroupTournaments()
                 // Let's find the selected group name.
-                setupGroupName(currentUserGroupSelected as! String)
+                setupGroupName()
             } else {
                 // No group is selected for this user, let's ask user to select the group now.
                 self.performSegue(withIdentifier: "showTournaments", sender: self)
@@ -46,9 +48,8 @@ class GroupTournamentsViewController: UIViewController {
         }
     }
     
-    func showGroupTournaments(_ groupId: String) {
-        print("showGroupTournaments \(groupId)")
-        _refHandle = ref.child("groups/\(groupId)/tournaments").observe(.childAdded) { (tournamentSnapshot: DataSnapshot) in
+    func showGroupTournaments() {
+        _refHandle = ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childAdded) { (tournamentSnapshot: DataSnapshot) in
             print("Tournament snapshot \(tournamentSnapshot)")
             if tournamentSnapshot.childrenCount > 0 {
                 self.tournaments.append(tournamentSnapshot)
@@ -57,13 +58,25 @@ class GroupTournamentsViewController: UIViewController {
         }
     }
     
-    func setupGroupName(_ groupId: String) {
-        ref.child("groups/\(groupId)").observeSingleEvent(of: .value, with: { (snapshot) in
-          // Get user value
+    func setupGroupName() {
+        ref.child("groups/\(currentSelectedGroupId!)").observeSingleEvent(of: .value, with: { (snapshot) in
+          print("GroupName \(snapshot)")
+            // Get user value
           let value = snapshot.value as? NSDictionary
           let groupName = value?["name"] as? String ?? ""
           self.title = groupName
         })
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "createTournament" {
+            let nav = segue.destination as! UINavigationController
+            let tournamentNameVC = nav.topViewController as! TournamentNameViewController
+            
+            let createTournamentModel: CreateTournament = CreateTournament()
+            createTournamentModel.groupId = currentSelectedGroupId
+            tournamentNameVC.createTournament = createTournamentModel
+        }
     }
     
 }
