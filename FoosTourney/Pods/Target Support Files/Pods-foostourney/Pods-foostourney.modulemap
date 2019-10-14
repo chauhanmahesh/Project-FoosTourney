@@ -1,0 +1,6 @@
+framework module Pods_foostourney {
+  umbrella header "Pods-foostourney-umbrella.h"
+
+  export *
+  module * { export * }
+}

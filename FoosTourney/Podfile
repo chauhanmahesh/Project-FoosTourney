@@ -1,0 +1,18 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'foostourney' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for foostourney
+
+  # Add the Firebase pod for Google Analytics
+  pod 'Firebase/Analytics'
+  # Realtime Database
+  pod 'Firebase/Database'
+  # Firebase UI
+  pod 'FirebaseUI/Auth', '~> 8.0'
+  pod 'FirebaseUI/Google', '~> 8.0'
+
+end
