@@ -14,8 +14,11 @@ class CreateTournament {
     
     var tournamentName: String?
     var tournamentType: TournamentType = .doubles
-    // Holds the player id's
-    var players: [String] = []
+    
+    // Holds the teams.
+    // If tournament type is Doubles then teams will hold something like [[Player1, Player2], [Player3, Player4]]
+    // If tournament type is Singles then teams will hold something like [[Player1], [Player2], [Player3], [Player4]]
+    var teams: [[String]] = []
     
     public init() {}
     

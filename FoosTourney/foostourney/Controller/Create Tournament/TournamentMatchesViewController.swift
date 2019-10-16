@@ -1,8 +1,8 @@
 //
-//  SelectTournamentPlayersViewController.swift
+//  TournamentMatchesViewController.swift
 //  foostourney
 //
-//  Created by Mahesh Chauhan on 14/10/19.
+//  Created by Mahesh Chauhan on 15/10/19.
 //  Copyright © 2019 Mahesh Chauhan. All rights reserved.
 //
 
@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import Firebase
 
-class SelectTournamentPlayersViewController: UIViewController {
+class TournamentMatchesViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var primaryAction: UIButton!
@@ -21,20 +21,6 @@ class SelectTournamentPlayersViewController: UIViewController {
     var playerIds: [DataSnapshot]! = []
     
     var createTournament: CreateTournament!
-    
-    @IBAction func onPrimaryAction() {
-        if createTournament.tournamentType == .singles {
-//            let generated = nil //generateMatches()
-//            if generated {
-//                performSegue(withIdentifier: "generateMatches", sender: self)
-//            } else {
-//                print("Error generating matches.")
-//            }
-        } else {
-            createTournament.teams = GenericUtility.generateTeams(allPlayerSnapshots: playerIds, selectedIndexs: tableView.indexPathsForSelectedRows!.map{ return $0.row })
-            performSegue(withIdentifier: "generateTeams", sender: self)
-        }
-    }
     
     override func viewDidLoad() {
         configureDatabase()
@@ -48,19 +34,6 @@ class SelectTournamentPlayersViewController: UIViewController {
         } else {
             primaryAction.setTitle("Generate Teams", for: .normal)
         }
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "generateTeams" {
-            let teamsVC = segue.destination as! TournamentTeamsViewController
-            teamsVC.createTournament = createTournament
-        }
-        
-        if segue.identifier == "generateMatches" {
-            let matchesVC = segue.destination as! TournamentMatchesViewController
-            matchesVC.createTournament = createTournament
-        }
-        
     }
     
     func configureDatabase() {
@@ -77,7 +50,7 @@ class SelectTournamentPlayersViewController: UIViewController {
 
 }
 
-extension SelectTournamentPlayersViewController: UITableViewDelegate, UITableViewDataSource {
+extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.playerIds.count
@@ -103,4 +76,3 @@ extension SelectTournamentPlayersViewController: UITableViewDelegate, UITableVie
     }
     
 }
-
