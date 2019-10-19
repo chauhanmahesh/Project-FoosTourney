@@ -14,5 +14,8 @@ target 'foostourney' do
   # Firebase UI
   pod 'FirebaseUI/Auth', '~> 8.0'
   pod 'FirebaseUI/Google', '~> 8.0'
+  
+  # Fake data generator
+  pod 'Fakery'
 
 end

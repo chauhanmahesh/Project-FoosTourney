@@ -10,11 +10,7 @@ import UIKit
 
 class MatchViewCell: UITableViewCell {
 
-    @IBOutlet weak var name: UILabel!
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        accessoryType = selected ? UITableViewCell.AccessoryType.checkmark : UITableViewCell.AccessoryType.none
-    }
+    @IBOutlet weak var teamOne: UILabel!
+    @IBOutlet weak var teamTwo: UILabel!
     
 }

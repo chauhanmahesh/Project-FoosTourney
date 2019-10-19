@@ -24,15 +24,27 @@ class SelectTournamentPlayersViewController: UIViewController {
     
     @IBAction func onPrimaryAction() {
         if createTournament.tournamentType == .singles {
-//            let generated = nil //generateMatches()
-//            if generated {
-//                performSegue(withIdentifier: "generateMatches", sender: self)
-//            } else {
-//                print("Error generating matches.")
-//            }
+            // Let's first prepare teams structure. We need to get the selected players from the list.
+            let teams: [Team] = tableView.indexPathsForSelectedRows!.map {
+                let snapshot = playerIds[$0.row]
+                
+                let player = snapshot.value as! Dictionary<String, Any>
+                let playerId = player[DatabaseFields.CommonFields.id] as! String
+                
+                return Team(players: [Player(playerId: playerId)])
+            }
+            createTournament.matches = GenericUtility.generateMatches(allTeams: teams)
+            performSegue(withIdentifier: "generateSinglesMatches", sender: self)
         } else {
             createTournament.teams = GenericUtility.generateTeams(allPlayerSnapshots: playerIds, selectedIndexs: tableView.indexPathsForSelectedRows!.map{ return $0.row })
             performSegue(withIdentifier: "generateTeams", sender: self)
+        }
+    }
+    
+    @IBAction func selectAllPlayers() {
+        let totalRows = tableView.numberOfRows(inSection: 0)
+        for row in 0..<totalRows {
+            tableView.selectRow(at: IndexPath(row: row, section: 0), animated: true, scrollPosition: UITableView.ScrollPosition.none)
         }
     }
     
@@ -56,7 +68,7 @@ class SelectTournamentPlayersViewController: UIViewController {
             teamsVC.createTournament = createTournament
         }
         
-        if segue.identifier == "generateMatches" {
+        if segue.identifier == "generateSinglesMatches" {
             let matchesVC = segue.destination as! TournamentMatchesViewController
             matchesVC.createTournament = createTournament
         }
@@ -65,9 +77,7 @@ class SelectTournamentPlayersViewController: UIViewController {
     
     func configureDatabase() {
         ref = Database.database().reference()
-        print("SelectTournamentPlayersViewController groupId : \(createTournament.groupId)")
         _refHandle = ref.child("groups/\(createTournament.groupId!)/members").observe(.childAdded) { (memberSnapshot: DataSnapshot) in
-            print("Member memberSnapshot.childrenCount \(memberSnapshot.childrenCount)")
             if memberSnapshot.childrenCount > 0 {
                 self.playerIds.append(memberSnapshot)
                 self.tableView.reloadData()

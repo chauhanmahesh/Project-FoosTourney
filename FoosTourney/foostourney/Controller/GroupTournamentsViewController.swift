@@ -64,7 +64,7 @@ class GroupTournamentsViewController: UIViewController {
             // Get user value
           let value = snapshot.value as? NSDictionary
           let groupName = value?["name"] as? String ?? ""
-          self.title = groupName
+          //self.title = groupName
         })
     }
     

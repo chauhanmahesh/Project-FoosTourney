@@ -187,7 +187,7 @@
         <scene sceneID="1oT-Cq-esY">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ghZ-l0-jDK" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Tournaments" id="f0N-oR-ipS"/>
+                    <tabBarItem key="tabBarItem" title="Tournaments" image="icons8-trophy" id="f0N-oR-ipS"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="sf2-at-gAF">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -285,7 +285,7 @@
         <scene sceneID="9je-St-as8">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="9t1-lu-biS" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Profile" id="wra-v1-fi7"/>
+                    <tabBarItem key="tabBarItem" title="Profile" image="icons8-user" id="wra-v1-fi7"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="9Y6-U5-7ru">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -470,7 +470,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dQD-C8-W0Y" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2620" y="27"/>
+            <point key="canvasLocation" x="2618.840579710145" y="26.785714285714285"/>
         </scene>
         <!--Create Tournament-->
         <scene sceneID="qmh-RC-4e0">
@@ -540,12 +540,18 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="feD-GO-9l7"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Create Tournament" id="NNM-nR-j5b"/>
+                    <navigationItem key="navigationItem" title="Create Tournament" id="NNM-nR-j5b">
+                        <barButtonItem key="rightBarButtonItem" title="Select All" id="ZWq-mt-P6N">
+                            <connections>
+                                <action selector="selectAllPlayers" destination="Nna-aY-Glf" id="G5c-ym-mcW"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="primaryAction" destination="3gC-3k-d8b" id="oeQ-ee-JL9"/>
                         <outlet property="tableView" destination="RhY-Tk-Bwo" id="unm-No-ys0"/>
                         <segue destination="8D0-mb-k45" kind="show" identifier="generateTeams" id="EWS-xo-cUQ"/>
-                        <segue destination="N8P-rK-5UN" kind="show" identifier="generateMatches" id="O9f-Ek-TNG"/>
+                        <segue destination="N8P-rK-5UN" kind="show" identifier="generateSinglesMatches" id="O9f-Ek-TNG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xLU-s1-Rmx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -560,15 +566,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="cPO-EC-8KA">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="cPO-EC-8KA">
                                 <rect key="frame" x="0.0" y="56" width="414" height="699"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MatchViewCell" id="xjG-II-BCD" customClass="MatchViewCell" customModule="foostourney" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="103"/>
+                                        <rect key="frame" x="0.0" y="28" width="414" height="102.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xjG-II-BCD" id="Z7B-Bw-ccc">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="103"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="102.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Team One" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OAH-8p-jf5">
@@ -578,7 +584,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Team Two" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ohg-hK-nfh">
-                                                    <rect key="frame" x="20" y="71.5" width="374" height="21.5"/>
+                                                    <rect key="frame" x="20" y="71.5" width="374" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -603,11 +609,15 @@
                                                 <constraint firstItem="OAH-8p-jf5" firstAttribute="leading" secondItem="Z7B-Bw-ccc" secondAttribute="leading" constant="20" id="zhj-ii-tgh"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="teamOne" destination="OAH-8p-jf5" id="DiU-2L-AkT"/>
+                                            <outlet property="teamTwo" destination="Ohg-hK-nfh" id="A5X-Yx-LyO"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
-                                    <outlet property="dataSource" destination="Nna-aY-Glf" id="ZDP-lT-qST"/>
-                                    <outlet property="delegate" destination="Nna-aY-Glf" id="gJR-nK-3as"/>
+                                    <outlet property="dataSource" destination="N8P-rK-5UN" id="Pvq-hS-NCf"/>
+                                    <outlet property="delegate" destination="N8P-rK-5UN" id="nft-EB-d8e"/>
                                 </connections>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qyb-jw-hYq">
@@ -619,6 +629,9 @@
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Start Tournament"/>
+                                <connections>
+                                    <action selector="startTournament" destination="N8P-rK-5UN" eventType="touchUpInside" id="JhQ-pX-63S"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
@@ -634,10 +647,13 @@
                         <viewLayoutGuide key="safeArea" id="slO-a5-GYI"/>
                     </view>
                     <navigationItem key="navigationItem" title="Create Tournament" id="Vt2-8p-8zf"/>
+                    <connections>
+                        <outlet property="tableView" destination="cPO-EC-8KA" id="wCX-k2-rZt"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zwD-GI-P36" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4591" y="391"/>
+            <point key="canvasLocation" x="4577" y="392"/>
         </scene>
         <!--Create Tournament-->
         <scene sceneID="OF7-9W-Gv9">
@@ -647,7 +663,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="udi-qR-SYy">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="udi-qR-SYy">
                                 <rect key="frame" x="0.0" y="56" width="414" height="699"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <prototypes>
@@ -670,6 +686,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="right" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Team Name" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iRO-o2-ltD">
+                                                    <rect key="frame" x="44" y="26" width="350" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                                                    <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="Vgx-Ze-pX7" firstAttribute="leading" secondItem="LBy-Dv-wmI" secondAttribute="leading" constant="20" id="13I-02-ba8"/>
@@ -684,6 +707,7 @@
                                         <connections>
                                             <outlet property="playerOne" destination="9dc-Pp-Bl5" id="ZGP-Co-bzx"/>
                                             <outlet property="playerTwo" destination="Vgx-Ze-pX7" id="2Qa-l2-Y3R"/>
+                                            <outlet property="teamName" destination="iRO-o2-ltD" id="sxb-Zp-wKl"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -701,6 +725,9 @@
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Generate Matches"/>
+                                <connections>
+                                    <action selector="onPrimaryAction" destination="8D0-mb-k45" eventType="touchUpInside" id="hez-uy-ZVC"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
@@ -718,6 +745,7 @@
                     <navigationItem key="navigationItem" title="Create Tournament" id="u9W-Yc-AS9"/>
                     <connections>
                         <outlet property="tableView" destination="udi-qR-SYy" id="KnW-xG-cub"/>
+                        <segue destination="N8P-rK-5UN" kind="show" identifier="generateDoublesMatches" id="c0P-9S-8bf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Iec-mK-VCR" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -777,4 +805,11 @@
             <point key="canvasLocation" x="1393" y="27"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="icons8-trophy" width="25" height="25"/>
+        <image name="icons8-user" width="25" height="25"/>
+    </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="O9f-Ek-TNG"/>
+    </inferredMetricsTieBreakers>
 </document>

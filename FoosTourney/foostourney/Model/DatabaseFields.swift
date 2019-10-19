@@ -21,5 +21,7 @@ struct DatabaseFields {
     
     struct TournamentFields {
         static let status = "status"
+        static let teams = "teams"
+        static let players = "players"
     }
 }

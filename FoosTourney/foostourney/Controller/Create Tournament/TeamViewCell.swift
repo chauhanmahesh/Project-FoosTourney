@@ -12,5 +12,6 @@ class TeamViewCell: UITableViewCell {
 
     @IBOutlet weak var playerOne: UILabel!
     @IBOutlet weak var playerTwo: UILabel!
+    @IBOutlet weak var teamName: UILabel!
 
 }

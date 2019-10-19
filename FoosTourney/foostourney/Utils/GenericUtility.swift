@@ -8,34 +8,34 @@
 
 import Foundation
 import Firebase
+import Fakery
 
 class GenericUtility {
     
     // Returned teams will of this form.
     // [[Player, Player], [Player, Player].....]
-    class func generateTeams(allPlayerSnapshots: [DataSnapshot], selectedIndexs: [Int]) -> [[String]] {
+    class func generateTeams(allPlayerSnapshots: [DataSnapshot], selectedIndexs: [Int]) -> [Team] {
         // Let's get the selected indexes.
         var selectedPlayers = selectedIndexs
-        var teams: [[String]] = []
-        var currentTeam: [String] = []
+        var teams: [Team] = []
+        var currentTeam: Team = Team(players: [])
         
         repeat {
             // Let's get random element.
             let randomPlayer = selectedPlayers.randomElement()!
             
             let player = allPlayerSnapshots[randomPlayer].value as! Dictionary<String, Any>
-            currentTeam.append(player[DatabaseFields.CommonFields.id] as! String)
-            if currentTeam.count == 2 {
+            currentTeam.players.append(Player(playerId: player[DatabaseFields.CommonFields.id] as! String))
+            if currentTeam.players.count == 2 {
+                // Let's generate a team name as well.
+                currentTeam.teamName = randomTeamName(existingTeamNames: teams.map { $0.teamName ?? "" })
                 teams.append(currentTeam)
-                currentTeam = []
+                currentTeam.players = []
             }
             selectedPlayers.remove(at: selectedPlayers.firstIndex(of: randomPlayer) ?? 0)
             
         } while selectedPlayers.count > 0
         
-        print("Teams: \(teams)")
-        print("---------------------------------------------")
-        print("Matches: \(generateMatches(allTeams: teams))")
         return teams
     }
     
@@ -72,23 +72,39 @@ class GenericUtility {
     //      ]
     // ]........
     // Also all teams (singles or doubles) will play a single match with each opponent.
-    class func generateMatches(allTeams: [[String]]) -> [[[String]]] {
-        var matches: [[[String]]] = []
+    class func generateMatches(allTeams: [Team]) -> [Match] {
+        var matches: [Match] = []
         var teams = allTeams
-        var currentTeam: [String] = []
+        var currentTeam: Team? = nil
         repeat {
-            if currentTeam.count == 0 {
+            if currentTeam == nil {
                 // Let's assign a team here.
                 currentTeam = teams.first!
             }
             // Now currentTeam will play matches will all other teams
             for otherTeam in teams.filter({$0 != currentTeam}) {
-                matches.append([currentTeam, otherTeam])
+                matches.append(Match(teams: [currentTeam!, otherTeam]))
             }
-            currentTeam = []
-            teams.remove(at: teams.firstIndex(of: currentTeam) ?? 0)
+            teams.remove(at: teams.firstIndex(of: currentTeam!) ?? 0)
+            currentTeam = nil
         } while teams.count > 0
+        
         return matches
+    }
+    
+    class func randomTeamName(existingTeamNames: [String]) -> String {
+        
+        let faker = Faker(locale: "en-AU")
+        var teamName: String
+        repeat {
+            teamName = faker.vehicle.make()
+            // If team name is generated empty then this might go into infinite loop.
+            if teamName.isEmpty {
+                teamName = "Random"
+            }
+        } while existingTeamNames.contains(teamName)
+        return teamName
+        
     }
 
 }
