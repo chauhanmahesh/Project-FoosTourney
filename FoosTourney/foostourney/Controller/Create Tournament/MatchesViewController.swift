@@ -1,5 +1,5 @@
 //
-//  TournamentMatchesViewController.swift
+//  MatchesViewController.swift
 //  foostourney
 //
 //  Created by Mahesh Chauhan on 15/10/19.
@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import Firebase
 
-class TournamentMatchesViewController: UIViewController {
+class MatchesViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -23,24 +23,75 @@ class TournamentMatchesViewController: UIViewController {
         tournament[DatabaseFields.TournamentFields.status] = "In Progress"
         let newTournamentRef = ref.child("groups/\(createTournament.groupId!)/tournaments").childByAutoId()
         newTournamentRef.setValue(tournament)
-        // Let's add matches.
-        for match in createTournament.matches {
-            let matchRef = newTournamentRef.child("matches").childByAutoId()
-            
-            for team in match.teams {
-                let teamRef = matchRef.child("teams").childByAutoId()
+        
+        // Let's first write all the players under tournament so that we can reuse the id when we will write those players under teams.
+        var playersDict: Dictionary<String, Player> = [:]
+
+        for player in createTournament.players {
+            let playerRef = newTournamentRef.child("players").childByAutoId()
+            if let key = playerRef.key {
+                playersDict[key] = player
+                var playerData = [DatabaseFields.CommonFields.id: player.playerId]
+                playerRef.setValue(playerData)
+            }
+        }
+        
+        // Let's write all the teams now.
+        var teamsDict: Dictionary<String, Team> = [:]
+        
+        for team in createTournament.teams {
+            let teamRef = newTournamentRef.child("teams").childByAutoId()
+            if let key = teamRef.key {
+                teamsDict[key] = team
                 var teamData: [String: Any] = [DatabaseFields.CommonFields.name: team.teamName]
                 teamRef.setValue(teamData)
                 
                 for player in team.players {
-                    let playerRef = teamRef.child("players").childByAutoId()
-                    var playerData = [DatabaseFields.CommonFields.id: player.playerId]
-                    playerRef.setValue(playerData)
+                    // Let's get the playerRefid from /tournaments/players/
+                    let playerRefKey = playersDict.first(where: {
+                        $0.value == player
+                        })?.key
+                    if let playerKey = playerRefKey {
+                        let playerRef = teamRef.child("players").child(playerKey)
+                        var playerData = [DatabaseFields.CommonFields.id: player.playerId]
+                        playerRef.setValue(playerData)
+                    }
                 }
-                
             }
-
         }
+        
+        
+        // Let's write all the matches now.
+        
+        for match in createTournament.matches {
+            let matchRef = newTournamentRef.child("matches").childByAutoId()
+            
+            for team in match.teams {
+                // Let' get the teamRefId from /tournaments/teams
+                let teamRefKey = teamsDict.first(where: {
+                    $0.value == team
+                    })?.key
+                if let teamKey = teamRefKey {
+                    let teamRef = matchRef.child("teams").child(teamKey)
+                    var teamData: [String: Any] = [DatabaseFields.CommonFields.name: team.teamName]
+                    teamRef.setValue(teamData)
+                    
+                    for player in team.players {
+                        
+                        // Let's get the playerRefid from /tournaments/players/
+                        let playerRefKey = playersDict.first(where: {
+                            $0.value == player
+                            })?.key
+                        if let playerKey = playerRefKey {
+                            let playerRef = teamRef.child("players").child(playerKey)
+                            var playerData = [DatabaseFields.CommonFields.id: player.playerId]
+                            playerRef.setValue(playerData)
+                        }
+                    }
+                }
+            }
+        }
+        
         // Let's dismiss.
         dismiss(animated: true, completion: nil)
     }
@@ -55,7 +106,7 @@ class TournamentMatchesViewController: UIViewController {
     
 }
 
-extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataSource {
+extension MatchesViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.createTournament.matches.count
@@ -74,12 +125,10 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
         } else {
             var teamOneName = ""
             for player in teamOne.players {
-                print("Getting player details for : \(player.playerId)")
                 ref.child("members/\(player.playerId)").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {
                         let value = snapshot.value as? NSDictionary
                         let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        print("Getting player details for  memberName: \(memberName)")
                         if teamOneName.isEmpty {
                             teamOneName.append(memberName)
                             if self.createTournament.tournamentType == .singles {

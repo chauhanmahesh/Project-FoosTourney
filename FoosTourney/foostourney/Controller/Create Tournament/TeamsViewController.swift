@@ -1,5 +1,5 @@
 //
-//  TournamentTeamsViewController.swift
+//  TeamsViewController.swift
 //  foostourney
 //
 //  Created by Mahesh Chauhan on 15/10/19.
@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import Firebase
 
-class TournamentTeamsViewController: UIViewController {
+class TeamsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -34,7 +34,7 @@ class TournamentTeamsViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == "generateDoublesMatches" {
-            let matchesVC = segue.destination as! TournamentMatchesViewController
+            let matchesVC = segue.destination as! MatchesViewController
             matchesVC.createTournament = createTournament
         }
         
@@ -42,7 +42,7 @@ class TournamentTeamsViewController: UIViewController {
     
 }
 
-extension TournamentTeamsViewController: UITableViewDelegate, UITableViewDataSource {
+extension TeamsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.createTournament.teams.count
@@ -53,7 +53,6 @@ extension TournamentTeamsViewController: UITableViewDelegate, UITableViewDataSou
         
         let playerOneId = self.createTournament.teams[indexPath.row].players[0].playerId
         let playerTwoId = self.createTournament.teams[indexPath.row].players[1].playerId
-        print("PlayerOne : \(playerOneId), PlayerTwo : \(playerTwoId)")
         
         // Now let's find out the name of the player one.
         ref.child("members/\(playerOneId)").observeSingleEvent(of: .value, with: { (snapshot) in

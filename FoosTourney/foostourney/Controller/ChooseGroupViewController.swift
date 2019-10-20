@@ -10,12 +10,17 @@ import Foundation
 import UIKit
 import Firebase
 
+protocol GroupSelectionDelegateProtocol {
+    func onGroupSelected()
+}
+
 class ChooseGroupViewController: UIViewController {
     
     var ref: DatabaseReference!
-    fileprivate var _refHandle: DatabaseHandle!
     
     var groups: [DataSnapshot]! = []
+    
+    var delegate: GroupSelectionDelegateProtocol? = nil
     
     @IBOutlet var groupsCollectionView: UICollectionView!
     
@@ -26,8 +31,12 @@ class ChooseGroupViewController: UIViewController {
     func configureDatabase() {
         ref = Database.database().reference()
         // Let's listen for new groups from the firebase database
-        _refHandle = ref.child("groups").observe(.childAdded) { (snapshot: DataSnapshot) in
-            let query = snapshot.childSnapshot(forPath: "/members").ref.queryOrdered(byChild: "id").queryEqual(toValue: Auth.auth().currentUser?.uid)
+        observeChanges()
+    }
+    
+    func observeChanges() {
+        ref.child("groups").observe(.childAdded) { (snapshot: DataSnapshot) in
+            let query = snapshot.childSnapshot(forPath: "/members").ref.queryOrdered(byChild: "authenticatedId").queryEqual(toValue: Auth.auth().currentUser?.uid)
             query.observe(.value, with: { (memberSnapshot) in
                 if memberSnapshot.childrenCount > 0 {
                     self.groups.append(snapshot)
@@ -35,10 +44,35 @@ class ChooseGroupViewController: UIViewController {
                 }
             })
         }
-    }
-    
-    deinit {
-        ref.child("groups").removeObserver(withHandle: _refHandle)
+        
+        ref.child("groups").observe(.childRemoved) { (snapshot: DataSnapshot) in
+            let query = snapshot.childSnapshot(forPath: "/members").ref.queryOrdered(byChild: "authenticatedId").queryEqual(toValue: Auth.auth().currentUser?.uid)
+            query.observe(.value, with: { (memberSnapshot) in
+                if memberSnapshot.childrenCount > 0 {
+                    self.groups.removeAll(where: {
+                        return $0.key == memberSnapshot.key
+                    })
+                    self.groupsCollectionView.reloadData()
+                }
+            })
+        }
+        
+        ref.child("groups").observe(.childChanged) { (snapshot: DataSnapshot) in
+            let query = snapshot.childSnapshot(forPath: "/members").ref.queryOrdered(byChild: "authenticatedId").queryEqual(toValue: Auth.auth().currentUser?.uid)
+            query.observe(.value, with: { (memberSnapshot) in
+                if memberSnapshot.childrenCount > 0 {
+                    let matchedSnapshot = self.groups.first(where: {
+                        return $0.key == memberSnapshot.key
+                    })
+                    if let matchedItem = matchedSnapshot {
+                        if let index = self.groups.firstIndex(of: matchedItem) {
+                            self.groups[index] = memberSnapshot
+                            self.groupsCollectionView.reloadData()
+                        }
+                    }
+                }
+            })
+        }
     }
     
 }
@@ -72,6 +106,12 @@ extension ChooseGroupViewController: UICollectionViewDataSource {
         var userGroupDict: Dictionary<String, String> = [:]
         userGroupDict[Auth.auth().currentUser?.uid ?? ""] = selectedGroup.key
         UserDefaults.standard.set(userGroupDict, forKey: UserDefaultsKey.userGroupDict)
+        
+        // Let's call the delegate method.
+        if let delegate = self.delegate {
+            print("Calling delegate API")
+            delegate.onGroupSelected()
+        }
         dismiss(animated: true, completion: nil)
     }
     
@@ -82,7 +122,6 @@ extension ChooseGroupViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let yourWidth = (collectionView.bounds.width - 10) / 3.0
         let yourHeight = yourWidth
-        print("Cell \(yourWidth)-\(yourHeight)")
         return CGSize(width: yourWidth, height: yourHeight)
     }
     

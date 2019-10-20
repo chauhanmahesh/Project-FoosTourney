@@ -10,10 +10,11 @@ import Foundation
 import UIKit
 import Firebase
 
-class TournamentNameViewController: UIViewController {
+class EnterNameViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet var tournamentNameTextField: UITextField!
     @IBOutlet var tournamentTypeSwitch: UISwitch!
+    @IBOutlet var primaryAction: UIButton!
     
     var createTournament: CreateTournament!
     
@@ -22,13 +23,20 @@ class TournamentNameViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let updatedString = (textField.text as NSString?)?.replacingCharacters(in: range, with: string)
+        primaryAction.isEnabled = !(updatedString?.isEmpty ?? true)
+        return true
+    }
+    
     override func viewDidLoad() {
-        
+        // Field is disabled to start with.
+        primaryAction.isEnabled = false
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "selectPlayers" {
-            let selectPlayersVC = segue.destination as! SelectTournamentPlayersViewController
+            let selectPlayersVC = segue.destination as! SelectPlayersViewController
             
             createTournament.tournamentName = tournamentNameTextField.text ?? "Untitled"
             createTournament.tournamentType = tournamentTypeSwitch.isOn ? .doubles : .singles

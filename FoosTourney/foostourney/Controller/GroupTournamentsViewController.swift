@@ -10,19 +10,18 @@ import Foundation
 import UIKit
 import Firebase
 
-class GroupTournamentsViewController: UIViewController {
+class GroupTournamentsViewController: UIViewController, GroupSelectionDelegateProtocol {
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var createTournament: UIBarButtonItem!
     
     var ref: DatabaseReference!
-    fileprivate var _refHandle: DatabaseHandle!
     
     var tournaments: [DataSnapshot]! = []
     var currentSelectedGroupId: String?
     
     override func viewDidLoad() {
         configureDatabase()
-        // Let's check first if user has selected any group to begin with or not. We can't show any tournaments if the group is not selected yet.
         checkGroupSelected()
     }
     
@@ -30,52 +29,96 @@ class GroupTournamentsViewController: UIViewController {
         ref = Database.database().reference()
     }
     
+    func onGroupSelected() {
+        print("onGroupSelected")
+        // Delegate method from ChooseGroupViewController.
+        // Will fetch again.
+        checkGroupSelected()
+        tournaments = [] // Let's clear current tournaments.
+        tableView.reloadData()
+    }
+    
     func checkGroupSelected() {
         if let userGroupDict = UserDefaults.standard.dictionary(forKey: UserDefaultsKey.userGroupDict) {
             if let currentUserGroupSelected = userGroupDict[Auth.auth().currentUser?.uid ?? ""] {
+                createTournament.isEnabled = true
                 currentSelectedGroupId = currentUserGroupSelected as! String
                 // Let's fetch the selected group tournaments.
-                showGroupTournaments()
+                observeTournamentChanges()
                 // Let's find the selected group name.
                 setupGroupName()
             } else {
+                createTournament.isEnabled = false
                 // No group is selected for this user, let's ask user to select the group now.
-                self.performSegue(withIdentifier: "showTournaments", sender: self)
+                self.performSegue(withIdentifier: "changeGroup", sender: self)
             }
         } else {
+            createTournament.isEnabled = false
             // Dictionary is not yet created means this is the first time. Let's ask user to choose group here as well.
-            self.performSegue(withIdentifier: "showTournaments", sender: self)
+            self.performSegue(withIdentifier: "changeGroup", sender: self)
         }
     }
     
-    func showGroupTournaments() {
-        _refHandle = ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childAdded) { (tournamentSnapshot: DataSnapshot) in
-            print("Tournament snapshot \(tournamentSnapshot)")
+    func observeTournamentChanges() {
+        ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childAdded) { (tournamentSnapshot: DataSnapshot) in
+            print("tournamentSnapshot : \(tournamentSnapshot)")
             if tournamentSnapshot.childrenCount > 0 {
                 self.tournaments.append(tournamentSnapshot)
                 self.tableView.reloadData()
+            }
+        }
+        ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childRemoved) { (tournamentSnapshot: DataSnapshot) in
+            if tournamentSnapshot.childrenCount > 0 {
+                self.tournaments.removeAll(where: {
+                    return $0.key == tournamentSnapshot.key
+                })
+                self.tableView.reloadData()
+            }
+        }
+        ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childChanged) { (tournamentSnapshot: DataSnapshot) in
+            if tournamentSnapshot.childrenCount > 0 {
+                print("Child updated")
+                let matchedSnapshot = self.tournaments.first(where: {
+                    return $0.key == tournamentSnapshot.key
+                })
+                if let matchedItem = matchedSnapshot {
+                    print("matchedItem : \(matchedItem)")
+                    if let index = self.tournaments.firstIndex(of: matchedItem) {
+                        print("index : \(index)")
+                        self.tournaments[index] = tournamentSnapshot
+                        self.tableView.reloadData()
+                    }
+                }
             }
         }
     }
     
     func setupGroupName() {
         ref.child("groups/\(currentSelectedGroupId!)").observeSingleEvent(of: .value, with: { (snapshot) in
-          print("GroupName \(snapshot)")
             // Get user value
-          let value = snapshot.value as? NSDictionary
-          let groupName = value?["name"] as? String ?? ""
-          //self.title = groupName
+            let value = snapshot.value as? NSDictionary
+            let groupName = value?["name"] as? String ?? ""
+            //self.title = groupName
         })
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "createTournament" {
             let nav = segue.destination as! UINavigationController
-            let tournamentNameVC = nav.topViewController as! TournamentNameViewController
+            let tournamentNameVC = nav.topViewController as! EnterNameViewController
             
             let createTournamentModel: CreateTournament = CreateTournament()
             createTournamentModel.groupId = currentSelectedGroupId
             tournamentNameVC.createTournament = createTournamentModel
+        } else if segue.identifier == "showTournamentDetail" {
+            let tournamentDetailVC = segue.destination as! TournamentDetailViewController
+            tournamentDetailVC.groupId = currentSelectedGroupId
+            tournamentDetailVC.tournamentId = (tournaments[tableView.indexPathForSelectedRow?.row ?? 0] as DataSnapshot).key
+        } else if segue.identifier == "changeGroup" {
+            print("Preparing for segue")
+            let nav = segue.destination as! UINavigationController
+            let chooseGroupVC = nav.topViewController as! ChooseGroupViewController
+            chooseGroupVC.delegate = self
         }
     }
     
@@ -84,6 +127,15 @@ class GroupTournamentsViewController: UIViewController {
 extension GroupTournamentsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if (self.tournaments.count == 0) {
+            if let selectedGroup = currentSelectedGroupId {
+                self.tableView.setEmptyMessage("Looks like you are working really hard. No tournaments are organised yet, let's create one by tapping on '+'.")
+            } else {
+                self.tableView.setEmptyMessage("You haven't selected any group yet. Please select a group to begin with or create a new one.")
+            }
+        } else {
+            self.tableView.restore()
+        }
         return self.tournaments.count
     }
     

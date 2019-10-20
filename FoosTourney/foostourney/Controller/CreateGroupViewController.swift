@@ -20,10 +20,22 @@ class CreateGroupViewController: UIViewController {
         let group = [DatabaseFields.CommonFields.name: groupNameTextField.text ?? "Untitled"]
         let newGroupReference = ref.child("groups").childByAutoId()
         newGroupReference.setValue(group)
-        let member = [DatabaseFields.CommonFields.id: Auth.auth().currentUser?.uid ?? "MemberId"]
-        newGroupReference.child("members").childByAutoId().setValue(member)
-        // Let's dismiss.
-        dismiss(animated: true, completion: nil)
+        if let userAuthenticatedId = Auth.auth().currentUser?.uid {
+            var member = [DatabaseFields.MemberFields.authenticatedId: userAuthenticatedId]
+            // Let's find the member id from /members.
+            ref.child("members").queryOrdered(byChild: "id").queryEqual(toValue: userAuthenticatedId).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    let memberDict = snapshot.value as! Dictionary<String, Any>
+                    print("memberDict : \(memberDict)")
+                    if let memberKey = memberDict.keys.first {
+                        member[DatabaseFields.CommonFields.id] = memberKey
+                        newGroupReference.child("members").childByAutoId().setValue(member)
+                        // Let's dismiss.
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }
+            })
+        }
     }
     
     @IBAction func cancelTapped() {

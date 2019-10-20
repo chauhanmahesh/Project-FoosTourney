@@ -17,6 +17,7 @@ struct DatabaseFields {
     
     struct MemberFields {
         static let email = "email"
+        static let authenticatedId = "authenticatedId"
     }
     
     struct TournamentFields {
