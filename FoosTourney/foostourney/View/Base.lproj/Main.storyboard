@@ -1047,7 +1047,6 @@
                                         <connections>
                                             <outlet property="teamOne" destination="WXM-Ya-Yee" id="slz-oP-vr6"/>
                                             <outlet property="teamTwo" destination="LqC-bG-69q" id="bOz-Cq-JTG"/>
-                                            <segue destination="Epn-Tz-eka" kind="presentation" id="RVB-55-ldf"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1068,6 +1067,7 @@
                     </view>
                     <connections>
                         <outlet property="tableView" destination="elU-2f-MzW" id="5Mt-cZ-GMh"/>
+                        <segue destination="Epn-Tz-eka" kind="show" identifier="recordScore" id="WG0-eD-cHo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GOH-1p-Vy1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1077,17 +1077,73 @@
         <!--Record Score-->
         <scene sceneID="cWP-sZ-iHw">
             <objects>
-                <viewController id="8Db-Mq-K4m" sceneMemberID="viewController">
+                <viewController id="8Db-Mq-K4m" customClass="RecordMatchScoreViewController" customModule="foostourney" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Xcd-ZW-ucb">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="671"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Team A" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KSK-oG-UFi">
+                                <rect key="frame" x="20" y="76" width="374" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Team B" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zv3-be-7xM">
+                                <rect key="frame" x="20" y="630" width="374" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d5P-ft-Yq4">
+                                <rect key="frame" x="0.0" y="107" width="414" height="216"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="8Db-Mq-K4m" id="gFr-PN-lvQ"/>
+                                    <outlet property="delegate" destination="8Db-Mq-K4m" id="GOR-zJ-pIA"/>
+                                </connections>
+                            </pickerView>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gk8-As-LHZ">
+                                <rect key="frame" x="0.0" y="404" width="414" height="216"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="8Db-Mq-K4m" id="JvH-53-rFF"/>
+                                    <outlet property="delegate" destination="8Db-Mq-K4m" id="lD1-xo-qnw"/>
+                                </connections>
+                            </pickerView>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="d5P-ft-Yq4" firstAttribute="top" secondItem="KSK-oG-UFi" secondAttribute="bottom" constant="10" id="BrO-xh-RVi"/>
+                            <constraint firstItem="zv3-be-7xM" firstAttribute="leading" secondItem="Cc4-aq-vkb" secondAttribute="leading" constant="20" id="Put-vY-jTa"/>
+                            <constraint firstItem="zv3-be-7xM" firstAttribute="top" secondItem="Gk8-As-LHZ" secondAttribute="bottom" constant="10" id="QAp-u9-lSg"/>
+                            <constraint firstItem="Gk8-As-LHZ" firstAttribute="trailing" secondItem="d5P-ft-Yq4" secondAttribute="trailing" id="UcJ-SQ-Mfp"/>
+                            <constraint firstItem="d5P-ft-Yq4" firstAttribute="leading" secondItem="Cc4-aq-vkb" secondAttribute="leading" id="Xee-7X-udY"/>
+                            <constraint firstItem="d5P-ft-Yq4" firstAttribute="centerX" secondItem="KSK-oG-UFi" secondAttribute="centerX" id="YUi-Gf-yNe"/>
+                            <constraint firstItem="Cc4-aq-vkb" firstAttribute="trailing" secondItem="KSK-oG-UFi" secondAttribute="trailing" constant="20" id="Ysm-VE-XRI"/>
+                            <constraint firstItem="KSK-oG-UFi" firstAttribute="top" secondItem="Cc4-aq-vkb" secondAttribute="top" constant="20" id="lcy-Y9-2VS"/>
+                            <constraint firstItem="Cc4-aq-vkb" firstAttribute="trailing" secondItem="zv3-be-7xM" secondAttribute="trailing" constant="20" id="myb-3Z-s1u"/>
+                            <constraint firstItem="Cc4-aq-vkb" firstAttribute="bottom" secondItem="zv3-be-7xM" secondAttribute="bottom" constant="20" id="rVL-KZ-jw0"/>
+                            <constraint firstItem="Gk8-As-LHZ" firstAttribute="leading" secondItem="d5P-ft-Yq4" secondAttribute="leading" id="rVS-RX-8hC"/>
+                            <constraint firstItem="KSK-oG-UFi" firstAttribute="leading" secondItem="Cc4-aq-vkb" secondAttribute="leading" constant="20" id="srm-Dx-RR3"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="Cc4-aq-vkb"/>
                     </view>
                     <navigationItem key="navigationItem" title="Record Score" id="6Lu-9f-9ap">
-                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="ENx-4P-gmC"/>
-                        <barButtonItem key="rightBarButtonItem" title="Save" id="1TR-Wp-7hV"/>
+                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="ENx-4P-gmC">
+                            <connections>
+                                <action selector="cancelTapped" destination="8Db-Mq-K4m" id="iIu-OY-LNy"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Save" id="1TR-Wp-7hV">
+                            <connections>
+                                <action selector="saveTapped" destination="8Db-Mq-K4m" id="gYN-Yy-bzY"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="teamAName" destination="KSK-oG-UFi" id="VAD-Xj-5iw"/>
+                        <outlet property="teamAScorePicker" destination="d5P-ft-Yq4" id="Nex-hp-XoS"/>
+                        <outlet property="teamBName" destination="zv3-be-7xM" id="yff-nu-b4x"/>
+                        <outlet property="teamBScorePicker" destination="Gk8-As-LHZ" id="7ml-vt-OCJ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5bL-Aw-Wfm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -1232,6 +1288,7 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Epn-Tz-eka" sceneMemberID="viewController">
                     <toolbarItems/>
+                    <navigationItem key="navigationItem" id="EL7-JS-s8W"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="hjv-tY-xd3">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>

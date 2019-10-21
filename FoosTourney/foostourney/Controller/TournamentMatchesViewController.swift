@@ -19,6 +19,7 @@ class TournamentMatchesViewController: UIViewController {
     var tournamentId: String!
     
     var matches: [DataSnapshot]! = []
+    var selectedMatchSnapshot: DataSnapshot!
     
     override func viewDidLoad() {
         configureDatabase()
@@ -59,12 +60,26 @@ class TournamentMatchesViewController: UIViewController {
         }
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "recordScore" {
+            let nav = segue.destination as! UINavigationController
+            let recordMatchScoreVC = nav.topViewController as! RecordMatchScoreViewController
+            recordMatchScoreVC.tournamentId = tournamentId
+            recordMatchScoreVC.matchSnapshot = selectedMatchSnapshot
+        }
+    }
+    
 }
 
 extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.matches.count
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedMatchSnapshot = self.matches[indexPath.row]
+        performSegue(withIdentifier: "recordScore", sender: self)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
