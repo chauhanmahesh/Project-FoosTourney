@@ -7,12 +7,38 @@
 //
 
 import UIKit
+import Firebase
+
+protocol GroupJoinedDelegateProtocol {
+    func onGroupJoined()
+}
 
 class GroupViewCell: UICollectionViewCell {
     
     @IBOutlet weak var groupBackground: UIImageView!
     
     @IBOutlet weak var groupName: UILabel!
+    
+    var groupIdToJoin: String?
+    
+    var delegate: GroupJoinedDelegateProtocol? = nil
+    
+    @IBAction func joinGroup() {
+        print("Let's join group : \(groupIdToJoin)")
+        if let userAuthenticatedId = Auth.auth().currentUser?.uid {
+            if let groupId = groupIdToJoin {
+                let databaseRef = Database.database().reference()
+                
+                databaseRef.child("members").queryOrdered(byChild: "id").queryEqual(toValue: userAuthenticatedId).observeSingleEvent(of: .value, with: { (snapshot) in
+                    let memberDict = snapshot.value as! Dictionary<String, Any>
+                    var member = [DatabaseFields.MemberFields.authenticatedId: userAuthenticatedId]
+                    member[DatabaseFields.CommonFields.id] = memberDict.keys.first!
+                    databaseRef.child("groups/\(groupId)/members").childByAutoId().setValue(member)
+                    self.delegate?.onGroupJoined()
+                })
+            }
+        }
+    }
     
 }
 

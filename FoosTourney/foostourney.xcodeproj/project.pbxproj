@@ -13,6 +13,8 @@
 		3D0FF534235C124600FBEBD1 /* StandingViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF533235C124600FBEBD1 /* StandingViewCell.swift */; };
 		3D0FF536235C6C1400FBEBD1 /* LauncherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF535235C6C1400FBEBD1 /* LauncherViewController.swift */; };
 		3D0FF538235C7D0800FBEBD1 /* UITableView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF537235C7D0800FBEBD1 /* UITableView+Extension.swift */; };
+		3D0FF53A235C9D4F00FBEBD1 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF539235C9D4F00FBEBD1 /* ProfileViewController.swift */; };
+		3D0FF53C235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF53B235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift */; };
 		3D29A917234CA6EB008858B9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29A916234CA6EB008858B9 /* AppDelegate.swift */; };
 		3D29A91B234CA6EB008858B9 /* HomeTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29A91A234CA6EB008858B9 /* HomeTabViewController.swift */; };
 		3D29A91E234CA6EB008858B9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D29A91C234CA6EB008858B9 /* Main.storyboard */; };
@@ -53,6 +55,8 @@
 		3D0FF533235C124600FBEBD1 /* StandingViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingViewCell.swift; sourceTree = "<group>"; };
 		3D0FF535235C6C1400FBEBD1 /* LauncherViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherViewController.swift; sourceTree = "<group>"; };
 		3D0FF537235C7D0800FBEBD1 /* UITableView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Extension.swift"; sourceTree = "<group>"; };
+		3D0FF539235C9D4F00FBEBD1 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		3D0FF53B235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMatchScoreViewController.swift; sourceTree = "<group>"; };
 		3D29A913234CA6EB008858B9 /* foostourney.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = foostourney.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D29A916234CA6EB008858B9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3D29A91A234CA6EB008858B9 /* HomeTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabViewController.swift; sourceTree = "<group>"; };
@@ -180,6 +184,8 @@
 				3D0FF533235C124600FBEBD1 /* StandingViewCell.swift */,
 				3D0FF535235C6C1400FBEBD1 /* LauncherViewController.swift */,
 				3D0FF537235C7D0800FBEBD1 /* UITableView+Extension.swift */,
+				3D0FF539235C9D4F00FBEBD1 /* ProfileViewController.swift */,
+				3D0FF53B235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -366,6 +372,7 @@
 				3D99E46F2354920F007D3897 /* SelectPlayersViewController.swift in Sources */,
 				3D960DED235A751D00008239 /* Player.swift in Sources */,
 				3DBC3438234F62760021909D /* UICollectionView+Extension.swift in Sources */,
+				3D0FF53A235C9D4F00FBEBD1 /* ProfileViewController.swift in Sources */,
 				3D7A7DC023519E02002E8F02 /* GroupTournamentsViewController.swift in Sources */,
 				3DBC343A234F68980021909D /* CreateGroupViewController.swift in Sources */,
 				3D99E4772355ED30007D3897 /* TeamViewCell.swift in Sources */,
@@ -374,6 +381,7 @@
 				3D0FF534235C124600FBEBD1 /* StandingViewCell.swift in Sources */,
 				3D29A91B234CA6EB008858B9 /* HomeTabViewController.swift in Sources */,
 				3D99E46D23548B69007D3897 /* TournamentType.swift in Sources */,
+				3D0FF53C235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift in Sources */,
 				3D29A917234CA6EB008858B9 /* AppDelegate.swift in Sources */,
 				3D0FF52E235BE96600FBEBD1 /* TournamentMatchesViewController.swift in Sources */,
 				3D0FF536235C6C1400FBEBD1 /* LauncherViewController.swift in Sources */,

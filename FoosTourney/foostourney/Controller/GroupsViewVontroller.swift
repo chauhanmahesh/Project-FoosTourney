@@ -35,13 +35,18 @@ class GroupsViewController: UIViewController {
 }
 
 extension GroupsViewController: UISearchBarDelegate {
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        updateResultsForSearchText(text: searchText)
+    }
+    
+    func updateResultsForSearchText(text: String) {
         self.groups = []
         ref.child("groups").observe(.childAdded) { (snapshot: DataSnapshot) in
             let group = snapshot.value as! Dictionary<String, Any>
             if let groupName = group[DatabaseFields.CommonFields.name] {
                 // Let's see if group name matches with searchtext.
-                if (groupName as! String).lowercased().contains(searchText.lowercased()) {
+                if (groupName as! String).lowercased().contains(text.lowercased()) {
                     let query = snapshot.childSnapshot(forPath: "/members").ref.queryOrdered(byChild: "authenticatedId").queryEqual(toValue: Auth.auth().currentUser?.uid)
                     query.observe(.value, with: { (memberSnapshot) in
                         if memberSnapshot.childrenCount > 0 {
@@ -58,6 +63,7 @@ extension GroupsViewController: UISearchBarDelegate {
             }
         }
     }
+    
 }
 
 extension GroupsViewController: UICollectionViewDataSource {
@@ -84,6 +90,8 @@ extension GroupsViewController: UICollectionViewDataSource {
         let groupName = group[DatabaseFields.CommonFields.name] ?? "Untitled"
         cell.groupBackground.backgroundColor = .random
         cell.groupName.text = groupName as! String
+        cell.groupIdToJoin = groupSnapshot.key
+        cell.delegate = self
         return cell
     }
     
@@ -109,4 +117,12 @@ extension GroupsViewController: UICollectionViewDelegateFlowLayout {
         return 5
     }
     
+}
+
+extension GroupsViewController: GroupJoinedDelegateProtocol {
+
+    func onGroupJoined() {
+        updateResultsForSearchText(text: searchBar.text ?? "")
+    }
+
 }
