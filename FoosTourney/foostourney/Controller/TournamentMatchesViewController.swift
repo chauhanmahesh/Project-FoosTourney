@@ -78,12 +78,14 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedMatchSnapshot = self.matches[indexPath.row]
-        performSegue(withIdentifier: "recordScore", sender: self)
+        if tableView.cellForRow(at: indexPath)?.selectionStyle != UITableViewCell.SelectionStyle.none {
+            selectedMatchSnapshot = self.matches[indexPath.row]
+            performSegue(withIdentifier: "recordScore", sender: self)
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MatchViewCell") as! MatchViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TournamentMatchViewCell") as! TournamentMatchViewCell
         
         let matchSnapshot: DataSnapshot! = matches[indexPath.row]
         let match = matchSnapshot.value as! Dictionary<String, Any>
@@ -106,12 +108,10 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
             }
             for playerKey in playerKeys {
                 let playerId = (players[playerKey] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
-                print("PlayerId : \(playerId)")
                 ref.child("members/\(playerId!)").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {
                         let value = snapshot.value as? NSDictionary
                         let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        print("Getting player details for  memberName: \(memberName)")
                         if teamOneName.isEmpty {
                             teamOneName.append(memberName)
                             if playerKeys.count == 1 {
@@ -127,6 +127,12 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
                     }
                 })
             }
+        }
+        let teamAScore = teamOne[DatabaseFields.MatchFields.score] as? Int
+        if let teamScore = teamAScore {
+            cell.teamOneScore.text = "\(teamScore)"
+        } else {
+            cell.teamOneScore.text = ""
         }
         
         if let teamName = teamTwo[DatabaseFields.CommonFields.name] as? String {
@@ -144,7 +150,6 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
                     if snapshot.exists() {
                         let value = snapshot.value as? NSDictionary
                         let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        print("Getting player details for  memberName: \(memberName)")
                         if teamTwoName.isEmpty {
                             teamTwoName.append(memberName)
                             if playerKeys.count == 1 {
@@ -161,7 +166,17 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
                 })
             }
         }
+        let teamBScore = teamTwo[DatabaseFields.MatchFields.score] as? Int
+        if let teamScore = teamBScore {
+            cell.teamTwoScore.text = "\(teamScore)"
+        } else {
+            cell.teamTwoScore.text = ""
+        }
         
+        // Also if the score is being recorded then let's make it unselectable.
+        if teamAScore ?? 0 > 0 || teamBScore ?? 0 > 0 {
+            cell.selectionStyle = UITableViewCell.SelectionStyle.none
+        }
         return cell
     }
     

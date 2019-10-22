@@ -118,6 +118,11 @@ extension TournamentStandingsViewController: UITableViewDelegate, UITableViewDat
                     })
                 }
             }
+            
+            // Let's udpate the stats.
+            cell.played.text = "\(teamDict[DatabaseFields.TeamFields.matchesPlayed] as? Int ?? 0)"
+            cell.won.text = "\(teamDict[DatabaseFields.TeamFields.matchesWon] as? Int ?? 0)"
+            cell.points.text = "\(teamDict[DatabaseFields.TeamFields.points] as? Int ?? 0)"
         }
         return cell
     }

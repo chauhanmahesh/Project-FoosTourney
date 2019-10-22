@@ -15,6 +15,7 @@
 		3D0FF538235C7D0800FBEBD1 /* UITableView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF537235C7D0800FBEBD1 /* UITableView+Extension.swift */; };
 		3D0FF53A235C9D4F00FBEBD1 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF539235C9D4F00FBEBD1 /* ProfileViewController.swift */; };
 		3D0FF53C235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF53B235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift */; };
+		3D0FF53E235F228F00FBEBD1 /* TournamentMatchViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0FF53D235F228F00FBEBD1 /* TournamentMatchViewCell.swift */; };
 		3D29A917234CA6EB008858B9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29A916234CA6EB008858B9 /* AppDelegate.swift */; };
 		3D29A91B234CA6EB008858B9 /* HomeTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29A91A234CA6EB008858B9 /* HomeTabViewController.swift */; };
 		3D29A91E234CA6EB008858B9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D29A91C234CA6EB008858B9 /* Main.storyboard */; };
@@ -57,6 +58,7 @@
 		3D0FF537235C7D0800FBEBD1 /* UITableView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Extension.swift"; sourceTree = "<group>"; };
 		3D0FF539235C9D4F00FBEBD1 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		3D0FF53B235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMatchScoreViewController.swift; sourceTree = "<group>"; };
+		3D0FF53D235F228F00FBEBD1 /* TournamentMatchViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentMatchViewCell.swift; sourceTree = "<group>"; };
 		3D29A913234CA6EB008858B9 /* foostourney.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = foostourney.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D29A916234CA6EB008858B9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3D29A91A234CA6EB008858B9 /* HomeTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabViewController.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				3D0FF537235C7D0800FBEBD1 /* UITableView+Extension.swift */,
 				3D0FF539235C9D4F00FBEBD1 /* ProfileViewController.swift */,
 				3D0FF53B235DDE9C00FBEBD1 /* RecordMatchScoreViewController.swift */,
+				3D0FF53D235F228F00FBEBD1 /* TournamentMatchViewCell.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				3DBC343A234F68980021909D /* CreateGroupViewController.swift in Sources */,
 				3D99E4772355ED30007D3897 /* TeamViewCell.swift in Sources */,
 				3DBC3436234F599A0021909D /* UIColor+Extension.swift in Sources */,
+				3D0FF53E235F228F00FBEBD1 /* TournamentMatchViewCell.swift in Sources */,
 				3D99E4732355EC1C007D3897 /* TeamsViewController.swift in Sources */,
 				3D0FF534235C124600FBEBD1 /* StandingViewCell.swift in Sources */,
 				3D29A91B234CA6EB008858B9 /* HomeTabViewController.swift in Sources */,

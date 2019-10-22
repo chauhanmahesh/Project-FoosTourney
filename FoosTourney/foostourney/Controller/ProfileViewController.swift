@@ -14,11 +14,26 @@ import FirebaseAuth
 class ProfileViewController: UIViewController {
     
     @IBOutlet weak var profileImage: UIImageView!
-    @IBOutlet var userName: UILabel!
+    @IBOutlet weak var userName: UILabel!
+    @IBOutlet weak var totalMatches: UILabel!
+    @IBOutlet weak var totalMatchesWon: UILabel!
+    @IBOutlet weak var winPerct: UILabel!
+    
+    var ref: DatabaseReference!
     
     override func viewDidLoad() {
+        configureDatabase()
         downloadProfileImaheAsync()
         userName.text = Auth.auth().currentUser?.displayName ?? "No Name"
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        // Let's set stats.
+        updateStats()
+    }
+    
+    func configureDatabase() {
+        ref = Database.database().reference()
     }
     
     func downloadProfileImaheAsync() {
@@ -33,6 +48,22 @@ class ProfileViewController: UIViewController {
                     self.profileImage.image = img
                 }
             }
+        }
+    }
+    
+    func updateStats() {
+        if let authenticatedUserid = Auth.auth().currentUser?.uid {
+            ref.child("members").queryOrdered(byChild: "id").queryEqual(toValue: authenticatedUserid).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    // Let's get value.
+                    let memberRefDict = snapshot.value as! Dictionary<String, Any>
+                    let memberDict = memberRefDict[memberRefDict.keys.first!] as! Dictionary<String, Any>
+                    //print("MemberDict : \(memberDict[memberDict.keys.first!])")
+                    self.totalMatches.text = "\(memberDict[DatabaseFields.MemberFields.totalMatchesPlayed] as? Int ?? 0)"
+                    self.totalMatchesWon.text = "\(memberDict[DatabaseFields.MemberFields.totalMatchesWon] as? Int ?? 0)"
+                    self.winPerct.text = "\(memberDict[DatabaseFields.MemberFields.totalWinPerct] as? Int ?? 0)"
+                }
+            })
         }
     }
     

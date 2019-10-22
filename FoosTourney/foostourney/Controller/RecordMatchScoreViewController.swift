@@ -12,7 +12,7 @@ import FirebaseUI
 import FirebaseAuth
 
 class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
-
+    
     let recordScorePickerData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     
     var tournamentId: String!
@@ -35,10 +35,28 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
     @IBAction func saveTapped() {
         // Let's save score.
         // let's save the score for team A first.
+        let teamAScore = self.recordScorePickerData[self.teamAScorePicker.selectedRow(inComponent: 0)]
+        let teamBScore = self.recordScorePickerData[self.teamBScorePicker.selectedRow(inComponent: 0)]
+        // let's record match scores.
+        recordMatchScore(teamAScore, teamBScore)
+        
+        if let userGroupDict = UserDefaults.standard.dictionary(forKey: UserDefaultsKey.userGroupDict) {
+            if let currentUserGroupSelected = userGroupDict[Auth.auth().currentUser?.uid ?? ""] as? String {
+                // Let's update the team individual stats.
+                recordTeamStats(currentUserGroupSelected, teamAScore, teamBScore)
+                // Let's update played individual record.
+                recordPlayerStats(currentUserGroupSelected, teamAScore, teamBScore)
+            }
+        }
+        // Let's dismiss.
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func recordMatchScore(_ teamAScore: Int, _ teamBScore: Int) {
         let matchTeamARef = matchSnapshot.ref.child("teams/\(teamASnapshotId!)")
         matchTeamARef.observeSingleEvent(of: .value, with: { (snapshot) in
             var teamDict = snapshot.value as! Dictionary<String, Any>
-            teamDict[DatabaseFields.MatchFields.score] = self.recordScorePickerData[self.teamAScorePicker.selectedRow(inComponent: 0)]
+            teamDict[DatabaseFields.MatchFields.score] = teamAScore
             matchTeamARef.setValue(teamDict)
         })
         
@@ -46,11 +64,74 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
         let matchTeamBRef = matchSnapshot.ref.child("teams/\(teamBSnapshotId!)")
         matchTeamBRef.observeSingleEvent(of: .value, with: { (snapshot) in
             var teamDict = snapshot.value as! Dictionary<String, Any>
-            teamDict[DatabaseFields.MatchFields.score] = self.recordScorePickerData[self.teamBScorePicker.selectedRow(inComponent: 0)]
+            teamDict[DatabaseFields.MatchFields.score] = teamBScore
             matchTeamBRef.setValue(teamDict)
         })
-        // Let's dismiss.
-        dismiss(animated: true, completion: nil)
+    }
+    
+    func recordTeamStats(_ groupId: String, _ teamAScore: Int, _ teamBScore: Int) {
+        let didTeamAWon = teamAScore > teamBScore
+        // Also let's update the team standings.
+        let teamARef = ref.child("groups/\(groupId)/tournaments/\(tournamentId!)/teams/\(teamASnapshotId!)")
+        teamARef.observeSingleEvent(of: .value, with: { (snapshot) in
+            var teamDict = snapshot.value as! Dictionary<String, Any>
+            // let's get the current matches played data.
+            
+            teamDict[DatabaseFields.TeamFields.matchesPlayed] = ((teamDict[DatabaseFields.TeamFields.matchesPlayed] as? Int) ?? 0) + 1
+            teamDict[DatabaseFields.TeamFields.matchesWon] = ((teamDict[DatabaseFields.TeamFields.matchesWon] as? Int) ?? 0) + (didTeamAWon ? 1 : 0)
+            teamDict[DatabaseFields.TeamFields.points] = ((teamDict[DatabaseFields.TeamFields.points] as? Int) ?? 0) + (didTeamAWon ? (2 + teamAScore - teamBScore) : 0)
+            teamARef.setValue(teamDict)
+        })
+        
+        let teamBRef = ref.child("groups/\(groupId)/tournaments/\(tournamentId!)/teams/\(teamBSnapshotId!)")
+        teamBRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            var teamDict = snapshot.value as! Dictionary<String, Any>
+            // let's get the current matches played data.
+            
+            teamDict[DatabaseFields.TeamFields.matchesPlayed] = ((teamDict[DatabaseFields.TeamFields.matchesPlayed] as? Int) ?? 0) + 1
+            teamDict[DatabaseFields.TeamFields.matchesWon] = ((teamDict[DatabaseFields.TeamFields.matchesWon] as? Int) ?? 0) + (!didTeamAWon ? 1 : 0)
+            teamDict[DatabaseFields.TeamFields.points] = ((teamDict[DatabaseFields.TeamFields.points] as? Int) ?? 0) + (!didTeamAWon ? (2 + teamBScore - teamAScore) : 0)
+            teamBRef.setValue(teamDict)
+        })
+    }
+    
+    func recordPlayerStats(_ groupId: String, _ teamAScore: Int, _ teamBScore: Int) {
+        let didTeamAWon = teamAScore > teamBScore
+        
+        let matchTeamARef = matchSnapshot.ref.child("teams/\(teamASnapshotId!)").observeSingleEvent(of: .value, with: { (snapshot) in
+            var teamDict = snapshot.value as! Dictionary<String, Any>
+            if let players = teamDict[DatabaseFields.TournamentFields.players] as? Dictionary<String, Any> {
+                for player in players.keys {
+                    let playerId = (players[player] as! Dictionary<String, String>)[DatabaseFields.CommonFields.id]
+                    self.updatePlayerStats(ofPlayerId: playerId!, didWon: didTeamAWon)
+                }
+            }
+        })
+        
+        let matchTeamBRef = matchSnapshot.ref.child("teams/\(teamBSnapshotId!)").observeSingleEvent(of: .value, with: { (snapshot) in
+            var teamDict = snapshot.value as! Dictionary<String, Any>
+            if let players = teamDict[DatabaseFields.TournamentFields.players] as? Dictionary<String, Any> {
+                for player in players.keys {
+                    let playerId = (players[player] as! Dictionary<String, String>)[DatabaseFields.CommonFields.id]
+                    self.updatePlayerStats(ofPlayerId: playerId!, didWon: !didTeamAWon)
+                }
+            }
+        })
+        
+    }
+    
+    func updatePlayerStats(ofPlayerId: String, didWon: Bool) {
+        let memberRef = ref.child("members/\(ofPlayerId)")
+        memberRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            var memberDict = snapshot.value as! Dictionary<String, Any>
+            
+            let matchesPlayed = ((memberDict[DatabaseFields.MemberFields.totalMatchesPlayed] as? Int) ?? 0) + 1
+            let matchesWon = ((memberDict[DatabaseFields.MemberFields.totalMatchesWon] as? Int) ?? 0) + (didWon ? 1 : 0)
+            memberDict[DatabaseFields.MemberFields.totalMatchesPlayed] =  matchesPlayed
+            memberDict[DatabaseFields.MemberFields.totalMatchesWon] =  matchesWon
+            memberDict[DatabaseFields.MemberFields.totalWinPerct] = Int(round(( Float(matchesWon) / Float(matchesPlayed) ) * 100))
+            memberRef.setValue(memberDict)
+        })
     }
     
     override func viewDidLoad() {

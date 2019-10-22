@@ -61,7 +61,6 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
     
     func observeTournamentChanges() {
         ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childAdded) { (tournamentSnapshot: DataSnapshot) in
-            print("tournamentSnapshot : \(tournamentSnapshot)")
             if tournamentSnapshot.childrenCount > 0 {
                 self.tournaments.append(tournamentSnapshot)
                 self.tableView.reloadData()
@@ -77,12 +76,10 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
         }
         ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childChanged) { (tournamentSnapshot: DataSnapshot) in
             if tournamentSnapshot.childrenCount > 0 {
-                print("Child updated")
                 let matchedSnapshot = self.tournaments.first(where: {
                     return $0.key == tournamentSnapshot.key
                 })
                 if let matchedItem = matchedSnapshot {
-                    print("matchedItem : \(matchedItem)")
                     if let index = self.tournaments.firstIndex(of: matchedItem) {
                         print("index : \(index)")
                         self.tournaments[index] = tournamentSnapshot
@@ -115,7 +112,6 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
             tournamentDetailVC.groupId = currentSelectedGroupId
             tournamentDetailVC.tournamentId = (tournaments[tableView.indexPathForSelectedRow?.row ?? 0] as DataSnapshot).key
         } else if segue.identifier == "changeGroup" {
-            print("Preparing for segue")
             let nav = segue.destination as! UINavigationController
             let chooseGroupVC = nav.topViewController as! ChooseGroupViewController
             chooseGroupVC.delegate = self

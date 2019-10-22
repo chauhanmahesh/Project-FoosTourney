@@ -18,6 +18,9 @@ struct DatabaseFields {
     struct MemberFields {
         static let email = "email"
         static let authenticatedId = "authenticatedId"
+        static let totalMatchesPlayed = "totalMatchesPlayed"
+        static let totalMatchesWon = "totalMatchesWon"
+        static let totalWinPerct = "totalWinPerct"
     }
     
     struct TournamentFields {
@@ -28,5 +31,11 @@ struct DatabaseFields {
     
     struct MatchFields {
         static let score = "score"
+    }
+    
+    struct TeamFields {
+        static let matchesPlayed = "matchesPlayed"
+        static let matchesWon = "matchesWon"
+        static let points = "points"
     }
 }
