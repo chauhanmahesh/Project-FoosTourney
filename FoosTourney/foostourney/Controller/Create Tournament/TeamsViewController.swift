@@ -13,10 +13,12 @@ import Firebase
 class TeamsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
     
     var createTournament: CreateTournament!
+    var membersNameData: [String: String] = [:]
     
     @IBAction func onPrimaryAction() {
         createTournament.matches = GenericUtility.generateMatches(allTeams: createTournament.teams)
@@ -24,11 +26,16 @@ class TeamsViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        configureDatabase()
-    }
-    
-    func configureDatabase() {
+        self.activityIndicator.startAnimating()
         ref = Database.database().reference()
+        // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
+        // mess up the tableview data.
+        fetchMembersData(ref: ref, completion: { membersData in
+            self.membersNameData = membersData
+            self.activityIndicator.stopAnimating()
+            // Data fetch complete. So now let's observe match changes.
+            self.tableView.reloadData()
+        })
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -50,26 +57,13 @@ extension TeamsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TeamViewCell") as! TeamViewCell
-        
+                
         let playerOneId = self.createTournament.teams[indexPath.row].players[0].playerId
-        let playerTwoId = self.createTournament.teams[indexPath.row].players[1].playerId
+        cell.playerOne.text = membersNameData[playerOneId]
         
-        // Now let's find out the name of the player one.
-        ref.child("members/\(playerOneId)").observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                let value = snapshot.value as? NSDictionary
-                let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                cell.playerOne.text = memberName
-            }
-        })
-        // Now let's find out the name of the player two.
-        ref.child("members/\(playerTwoId)").observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                let value = snapshot.value as? NSDictionary
-                let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                cell.playerTwo.text = memberName
-            }
-        })
+        let playerTwoId = self.createTournament.teams[indexPath.row].players[1].playerId
+        cell.playerTwo.text = membersNameData[playerTwoId]
+        
         // Now lets show the teamname.
         if let teamName = self.createTournament.teams[indexPath.row].teamName {
             cell.teamName.text = teamName

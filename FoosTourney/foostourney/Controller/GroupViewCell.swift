@@ -24,7 +24,6 @@ class GroupViewCell: UICollectionViewCell {
     var delegate: GroupJoinedDelegateProtocol? = nil
     
     @IBAction func joinGroup() {
-        print("Let's join group : \(groupIdToJoin)")
         if let userAuthenticatedId = Auth.auth().currentUser?.uid {
             if let groupId = groupIdToJoin {
                 let databaseRef = Database.database().reference()

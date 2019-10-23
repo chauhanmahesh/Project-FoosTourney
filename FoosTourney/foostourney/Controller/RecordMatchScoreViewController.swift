@@ -23,9 +23,11 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
     
     @IBOutlet weak var teamAName: UILabel!
     @IBOutlet weak var teamBName: UILabel!
-    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var teamAScorePicker: UIPickerView!
     @IBOutlet weak var teamBScorePicker: UIPickerView!
+    
+    var membersNameData: [String: String] = [:]
     
     @IBAction func cancelTapped() {
         // Let's dismiss.
@@ -46,10 +48,13 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
                 recordTeamStats(currentUserGroupSelected, teamAScore, teamBScore)
                 // Let's update played individual record.
                 recordPlayerStats(currentUserGroupSelected, teamAScore, teamBScore)
+                // Let's dismiss.
+                dismiss(animated: true, completion: nil)
             }
+        } else {
+            // Let's dismiss.
+            dismiss(animated: true, completion: nil)
         }
-        // Let's dismiss.
-        dismiss(animated: true, completion: nil)
     }
     
     func recordMatchScore(_ teamAScore: Int, _ teamBScore: Int) {
@@ -135,9 +140,16 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
     }
     
     override func viewDidLoad() {
-        configureDatabase()
-        // Update team names.
-        udpateTeamNames()
+        activityIndicator.startAnimating()
+        ref = Database.database().reference()
+        // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
+        // mess up the tableview data.
+        fetchMembersData(ref: ref, completion: { membersData in
+            self.membersNameData = membersData
+            self.activityIndicator.stopAnimating()
+            // Update team names.
+            self.udpateTeamNames()
+        })
     }
     
     func udpateTeamNames() {
@@ -154,73 +166,26 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
         
         if let teamName = teamOne[DatabaseFields.CommonFields.name] as? String {
             teamAName.text = teamName
+            // We can saftely set second team name without checking for null.
+            teamBName.text = teamTwo[DatabaseFields.CommonFields.name] as! String
         } else {
-            var teamOneName = ""
-            // Let's get the players.
-            let players = teamOne[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
-            let playerKeys = players.keys.map {
+            let teamOnePlayers = teamOne[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
+            let teamOnePlayerKeys = teamOnePlayers.keys.map {
                 $0
             }
-            for playerKey in playerKeys {
-                let playerId = (players[playerKey] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
-                ref.child("members/\(playerId!)").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        let value = snapshot.value as? NSDictionary
-                        let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        if teamOneName.isEmpty {
-                            teamOneName.append(memberName)
-                            if playerKeys.count == 1 {
-                                // Singles tournament.
-                                self.teamAName.text = teamOneName
-                            } else {
-                                teamOneName.append("/")
-                            }
-                        } else {
-                            teamOneName.append(memberName)
-                            self.teamAName.text = teamOneName
-                        }
-                    }
-                })
-            }
-        }
-        
-        if let teamName = teamTwo[DatabaseFields.CommonFields.name] as? String {
-            teamBName.text = teamName
-        } else {
-            var teamTwoName = ""
-            // Let's get the players.
-            let players = teamTwo[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
-            let playerKeys = players.keys.map {
+            // We can saftely assume that as its singles matches the player will be only one within a team.
+            let teamOnePlayerId = (teamOnePlayers[teamOnePlayerKeys[0]] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
+            self.teamAName.text = membersNameData[teamOnePlayerId as! String] ?? ""
+            
+            let teamTwoPlayers = teamTwo[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
+            let teamTwoPlayerKeys = teamTwoPlayers.keys.map {
                 $0
             }
-            for playerKey in playerKeys {
-                let playerId = (players[playerKey] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
-                ref.child("members/\(playerId!)").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        let value = snapshot.value as? NSDictionary
-                        let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        if teamTwoName.isEmpty {
-                            teamTwoName.append(memberName)
-                            if playerKeys.count == 1 {
-                                // Singles tournament.
-                                self.teamBName.text = teamTwoName
-                            } else {
-                                teamTwoName.append("/")
-                            }
-                        } else {
-                            teamTwoName.append(memberName)
-                            self.teamBName.text = teamTwoName
-                        }
-                    }
-                })
-            }
+            let teamTwoPlayerId = (teamTwoPlayers[teamTwoPlayerKeys[0]] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
+            self.teamBName.text = membersNameData[teamTwoPlayerId as! String] ?? ""
         }
     }
-    
-    func configureDatabase() {
-        ref = Database.database().reference()
-    }
-    
+
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }

@@ -13,10 +13,12 @@ import Firebase
 class MatchesViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
     
     var createTournament: CreateTournament!
+    var membersNameData: [String: String] = [:]
     
     @IBAction func startTournament() {
         var tournament: [String: Any] = [DatabaseFields.CommonFields.name: createTournament.tournamentName!]
@@ -97,11 +99,16 @@ class MatchesViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        configureDatabase()
-    }
-    
-    func configureDatabase() {
+        self.activityIndicator.startAnimating()
         ref = Database.database().reference()
+        // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
+        // mess up the tableview data.
+        fetchMembersData(ref: ref, completion: { membersData in
+            self.membersNameData = membersData
+            self.activityIndicator.stopAnimating()
+            // Data fetch complete. So now let's observe match changes.
+            self.tableView.reloadData()
+        })
     }
     
 }
@@ -122,52 +129,14 @@ extension MatchesViewController: UITableViewDelegate, UITableViewDataSource {
         
         if let teamOneName = teamOne.teamName {
             cell.teamOne.text = teamOneName
+            cell.teamTwo.text = teamTwo.teamName!
         } else {
-            var teamOneName = ""
-            for player in teamOne.players {
-                ref.child("members/\(player.playerId)").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        let value = snapshot.value as? NSDictionary
-                        let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        if teamOneName.isEmpty {
-                            teamOneName.append(memberName)
-                            if self.createTournament.tournamentType == .singles {
-                                cell.teamOne.text = teamOneName
-                            } else {
-                                teamOneName.append("/")
-                            }
-                        } else {
-                            teamOneName.append(memberName)
-                            cell.teamOne.text = teamOneName
-                        }
-                    }
-                })
-            }
-        }
-        
-        if let teamTwoName = teamTwo.teamName {
-            cell.teamTwo.text = teamTwoName
-        } else {
-            var teamTwoName = ""
-            for player in teamTwo.players {
-                ref.child("members/\(player.playerId)").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        let value = snapshot.value as? NSDictionary
-                        let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        if teamTwoName.isEmpty {
-                            teamTwoName.append(memberName)
-                            if self.createTournament.tournamentType == .singles {
-                                cell.teamTwo.text = teamTwoName
-                            } else {
-                                teamTwoName.append("/")
-                            }
-                        } else {
-                            teamTwoName.append(memberName)
-                            cell.teamTwo.text = teamTwoName
-                        }
-                    }
-                })
-            }
+            // Ok so this is a case when its actually singles match so we need to get the player teams from /members.
+            // Let's first get the teamOne data and then we will get teamTwo data.
+            // Let's get the players.
+            // We can saftely assume that as its singles matches the player will be only one within a team.
+            cell.teamOne.text = membersNameData[teamOne.players[0].playerId]
+            cell.teamTwo.text = membersNameData[teamTwo.players[0].playerId]
         }
         
         return cell

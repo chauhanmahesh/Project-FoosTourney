@@ -29,9 +29,15 @@ class EnterNameViewController: UIViewController, UITextFieldDelegate {
         return true
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
     override func viewDidLoad() {
         // Field is disabled to start with.
         primaryAction.isEnabled = false
+        tournamentNameTextField.delegate = self
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

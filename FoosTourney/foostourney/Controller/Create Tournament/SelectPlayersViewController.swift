@@ -14,12 +14,15 @@ class SelectPlayersViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var primaryAction: UIButton!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var topLabel: UILabel!
     
     var ref: DatabaseReference!
     
     var playerIds: [DataSnapshot]! = []
     
     var createTournament: CreateTournament!
+    var membersNameData: [String: String] = [:]
     
     @IBAction func onPrimaryAction() {
         if createTournament.tournamentType == .singles {
@@ -62,8 +65,28 @@ class SelectPlayersViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        configureDatabase()
+        self.activityIndicator.startAnimating()
+        ref = Database.database().reference()
+        // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
+        // mess up the tableview data.
+        fetchMembersData(ref: ref, completion: { membersData in
+            self.membersNameData = membersData
+            self.activityIndicator.stopAnimating()
+            // Data fetch complete. So now let's observe match changes.
+            self.observeChanges()
+        })
+        
         updateAction()
+        updateLabel()
+    }
+    
+    func updateLabel() {
+        // If tournament is singles tournament then we need minimum 2 players to start tournament. If its doubles then we need min 4 players and also players should be of even number.
+        if createTournament.tournamentType == .singles {
+            topLabel.text = "Select 2 players minimum."
+        } else {
+            topLabel.text = "Select even number of players and minimum 4"
+        }
     }
     
     func updateAction() {
@@ -134,11 +157,11 @@ extension SelectPlayersViewController: UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        primaryAction.isEnabled = (tableView.indexPathsForSelectedRows?.count ?? 0) >= 2
+        primaryAction.isEnabled = createTournament.tournamentType == .singles ? (tableView.indexPathsForSelectedRows?.count ?? 0) >= 2 : ((tableView.indexPathsForSelectedRows?.count ?? 0) >= 4 && (tableView.indexPathsForSelectedRows?.count ?? 0) % 2 == 0)
     }
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        primaryAction.isEnabled = (tableView.indexPathsForSelectedRows?.count ?? 0) >= 2
+        primaryAction.isEnabled = createTournament.tournamentType == .singles ? (tableView.indexPathsForSelectedRows?.count ?? 0) >= 2 : ((tableView.indexPathsForSelectedRows?.count ?? 0) >= 4 && (tableView.indexPathsForSelectedRows?.count ?? 0) % 2 == 0)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -148,14 +171,7 @@ extension SelectPlayersViewController: UITableViewDelegate, UITableViewDataSourc
         
         let playerId = player[DatabaseFields.CommonFields.id] as! String
         
-        // Now let's find out the name of the player.
-        ref.child("members/\(playerId)").observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                let value = snapshot.value as? NSDictionary
-                let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                cell.name.text = memberName
-            }
-        })
+        cell.name.text = membersNameData[playerId]
         
         return cell
     }

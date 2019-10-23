@@ -13,27 +13,34 @@ import Firebase
 class TournamentStandingsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
     fileprivate var _childAddedRefHandle: DatabaseHandle!
     var groupId: String!
     var tournamentId: String!
+    var membersNameData: [String: String] = [:]
     
     var teams: [DataSnapshot]! = []
     
     override func viewDidLoad() {
-        configureDatabase()
-    }
-    
-    func configureDatabase() {
+        activityIndicator.startAnimating()
         ref = Database.database().reference()
-        observeChanges()
+        // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
+        // mess up the tableview data.
+        fetchMembersData(ref: ref, completion: { membersData in
+            self.membersNameData = membersData
+            self.activityIndicator.stopAnimating()
+            // Data fetch complete. So now let's observe match changes.
+            self.observeChanges()
+        })
     }
     
     func observeChanges() {
-        ref.child("groups/\(groupId!)/tournaments/\(tournamentId!)/teams").observe(.childAdded) { (teamSnapshot: DataSnapshot) in
+        ref.child("groups/\(groupId!)/tournaments/\(tournamentId!)/teams").queryOrdered(byChild: "points").observe(.childAdded) { (teamSnapshot: DataSnapshot) in
             if teamSnapshot.childrenCount > 0 {
                 self.teams.append(teamSnapshot)
+                self.teams.reverse()
                 self.tableView.reloadData()
             }
         }
@@ -81,48 +88,33 @@ extension TournamentStandingsViewController: UITableViewDelegate, UITableViewDat
             cell.won.text = "Won"
             cell.points.text = "Points"
         } else {
-            
             let teamSnapshot: DataSnapshot! = self.teams[indexPath.row]
             let teamDict = teamSnapshot.value as! Dictionary<String, Any>
             
-            let players = teamDict[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
-            if players.count == 2 {
-                // Means this is doubles tournament.
-                cell.teamOrPlayerName.text = teamDict[DatabaseFields.CommonFields.name] as! String
+            let teamOrPlayerPoints = teamDict[DatabaseFields.TeamFields.points] as? Int ?? 0
+            var showLeaderTrophy = true
+            if indexPath.row == 0 && teamOrPlayerPoints == 0 {
+                // This means no matches is scored yet in this tournament. Hence we can't say who is leader. In this case we won't show any trophy.
+                showLeaderTrophy = false
             } else {
-                // Let's prepare team name from player data.
+                showLeaderTrophy = true
+            }
+            
+            if let teamName = teamDict[DatabaseFields.CommonFields.name] as? String {
+                cell.teamOrPlayerName.text = "\(teamName) \(indexPath.row == 0 && showLeaderTrophy ? "🏆" : "")"
+            } else {
                 let players = teamDict[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
-                var teamName = ""
                 let playerKeys = players.keys.map {
                     $0
                 }
-                for playerKey in playerKeys {
-                    let playerId = (players[playerKey] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
-                    ref.child("members/\(playerId!)").observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists() {
-                            let value = snapshot.value as? NSDictionary
-                            let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                            if teamName.isEmpty {
-                                teamName.append(memberName)
-                                if playerKeys.count == 1 {
-                                    // Singles tournament.
-                                    cell.teamOrPlayerName.text = teamName
-                                } else {
-                                    teamName.append("/")
-                                }
-                            } else {
-                                teamName.append(memberName)
-                                cell.teamOrPlayerName.text = teamName
-                            }
-                        }
-                    })
-                }
+                let playerId = (players[playerKeys[0]] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id] as! String
+                cell.teamOrPlayerName.text = "\(membersNameData[playerId] ?? "") \(indexPath.row == 0 && showLeaderTrophy ? "🏆" : "")"
             }
             
             // Let's udpate the stats.
             cell.played.text = "\(teamDict[DatabaseFields.TeamFields.matchesPlayed] as? Int ?? 0)"
             cell.won.text = "\(teamDict[DatabaseFields.TeamFields.matchesWon] as? Int ?? 0)"
-            cell.points.text = "\(teamDict[DatabaseFields.TeamFields.points] as? Int ?? 0)"
+            cell.points.text = "\(teamOrPlayerPoints)"
         }
         return cell
     }

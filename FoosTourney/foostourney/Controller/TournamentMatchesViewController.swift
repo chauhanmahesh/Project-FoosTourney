@@ -13,6 +13,7 @@ import Firebase
 class TournamentMatchesViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
     var groupId: String!
@@ -21,13 +22,22 @@ class TournamentMatchesViewController: UIViewController {
     var matches: [DataSnapshot]! = []
     var selectedMatchSnapshot: DataSnapshot!
     
-    override func viewDidLoad() {
-        configureDatabase()
-    }
+    var membersNameData: [String: String] = [:]
     
-    func configureDatabase() {
+    // Keeping this to track whether we updated the tournament status or not. We don't want to update it all the time.
+    var tournamentStatusUpdated = false
+    
+    override func viewDidLoad() {
+        activityIndicator.startAnimating()
         ref = Database.database().reference()
-        observeChanges()
+        // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
+        // mess up the tableview data.
+        fetchMembersData(ref: ref, completion: { membersData in
+            self.membersNameData = membersData
+            self.activityIndicator.stopAnimating()
+            // Data fetch complete. So now let's observe match changes.
+            self.observeChanges()
+        })
     }
     
     func observeChanges() {
@@ -69,6 +79,23 @@ class TournamentMatchesViewController: UIViewController {
         }
     }
     
+    // Checks and returns boolean to indicate whether all matches of this tournament are scored or not.
+    func isAllMatchesScored() -> Bool {
+        let scoredMatches = matches.filter({
+            let match = $0.value as! Dictionary<String, Any>
+            let teams = match[DatabaseFields.TournamentFields.teams] as! Dictionary<String, Any>
+            let teamKeys = teams.keys.map {
+                $0
+            }
+            let teamOneDict = teams[teamKeys[0]] as! Dictionary<String, Any>
+            let teamTwoDict = teams[teamKeys[1]] as! Dictionary<String, Any>
+            let teamAScore = teamOneDict[DatabaseFields.MatchFields.score] as? Int ?? 0
+            let teamBScore = teamTwoDict[DatabaseFields.MatchFields.score] as? Int ?? 0
+            return teamAScore > 0 || teamBScore > 0
+        })
+        return scoredMatches.count == matches.count
+    }
+    
 }
 
 extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataSource {
@@ -94,88 +121,71 @@ extension TournamentMatchesViewController: UITableViewDelegate, UITableViewDataS
         let teamKeys = teams.keys.map {
             $0
         }
-        let teamOne = teams[teamKeys[0]] as! Dictionary<String, Any>
-        let teamTwo = teams[teamKeys[1]] as! Dictionary<String, Any>
         
-        if let teamName = teamOne[DatabaseFields.CommonFields.name] as? String {
-            cell.teamOne.text = teamName
+        // Let's set the team/player names.
+        
+        // Let's first check if its a singles / doubles team. This is important as if the team is of singles we just need to show the player name (and the information of each player need to be set). However if its doubles, we just have to display the team name (and don't have to look for player name in another data structure.
+        let teamOneDict = teams[teamKeys[0]] as! Dictionary<String, Any>
+        let teamTwoDict = teams[teamKeys[1]] as! Dictionary<String, Any>
+        
+        let teamAScore = teamOneDict[DatabaseFields.MatchFields.score] as? Int
+        let teamBScore = teamTwoDict[DatabaseFields.MatchFields.score] as? Int
+        
+        if let teamName = teamOneDict[DatabaseFields.CommonFields.name] as? String {
+            // Means its doubles game. So let's just use the teamName.
+            cell.teamOne.text = "\(teamName) \((teamAScore ?? 0 > teamBScore ?? 0) ? "🏆" : "")"
+            // Also we know the teamTwo will be of doubles as well so let's not check anything and saftely set the teamname.
+            cell.teamTwo.text = "\(teamTwoDict[DatabaseFields.CommonFields.name] as! String) \((teamBScore ?? 0 > teamAScore ?? 0) ? "🏆" : "")"
         } else {
-            var teamOneName = ""
+            // Ok so this is a case when its actually singles match so we need to get the player teams from /members.
+            // Let's first get the teamOne data and then we will get teamTwo data.
             // Let's get the players.
-            let players = teamOne[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
-            let playerKeys = players.keys.map {
+            let teamOnePlayers = teamOneDict[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
+            let teamOnePlayerKeys = teamOnePlayers.keys.map {
                 $0
             }
-            for playerKey in playerKeys {
-                let playerId = (players[playerKey] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
-                ref.child("members/\(playerId!)").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        let value = snapshot.value as? NSDictionary
-                        let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        if teamOneName.isEmpty {
-                            teamOneName.append(memberName)
-                            if playerKeys.count == 1 {
-                                // Singles tournament.
-                                cell.teamOne.text = teamOneName
-                            } else {
-                                teamOneName.append("/")
-                            }
-                        } else {
-                            teamOneName.append(memberName)
-                            cell.teamOne.text = teamOneName
-                        }
-                    }
-                })
+            // We can saftely assume that as its singles matches the player will be only one within a team.
+            let teamOnePlayerId = (teamOnePlayers[teamOnePlayerKeys[0]] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
+            cell.teamOne.text = "\(membersNameData[teamOnePlayerId as! String] ?? "") \((teamAScore ?? 0 > teamBScore ?? 0) ? "🏆" : "")"
+            
+            let teamTwoPlayers = teamTwoDict[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
+            let teamTwoPlayerKeys = teamTwoPlayers.keys.map {
+                $0
             }
+            let teamTwoPlayerId = (teamTwoPlayers[teamTwoPlayerKeys[0]] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
+            cell.teamTwo.text = "\(membersNameData[teamTwoPlayerId as! String] ?? "") \((teamBScore ?? 0 > teamAScore ?? 0) ? "🏆" : "")"
         }
-        let teamAScore = teamOne[DatabaseFields.MatchFields.score] as? Int
+        
+        // Let's set score.
+        
         if let teamScore = teamAScore {
             cell.teamOneScore.text = "\(teamScore)"
         } else {
             cell.teamOneScore.text = ""
         }
         
-        if let teamName = teamTwo[DatabaseFields.CommonFields.name] as? String {
-            cell.teamTwo.text = teamName
-        } else {
-            var teamTwoName = ""
-            // Let's get the players.
-            let players = teamTwo[DatabaseFields.TournamentFields.players] as! Dictionary<String, Any>
-            let playerKeys = players.keys.map {
-                $0
-            }
-            for playerKey in playerKeys {
-                let playerId = (players[playerKey] as! Dictionary<String, Any>)[DatabaseFields.CommonFields.id]
-                ref.child("members/\(playerId!)").observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists() {
-                        let value = snapshot.value as? NSDictionary
-                        let memberName = value?[DatabaseFields.CommonFields.name] as? String ?? ""
-                        if teamTwoName.isEmpty {
-                            teamTwoName.append(memberName)
-                            if playerKeys.count == 1 {
-                                // Singles tournament.
-                                cell.teamTwo.text = teamTwoName
-                            } else {
-                                teamTwoName.append("/")
-                            }
-                        } else {
-                            teamTwoName.append(memberName)
-                            cell.teamTwo.text = teamTwoName
-                        }
-                    }
-                })
-            }
-        }
-        let teamBScore = teamTwo[DatabaseFields.MatchFields.score] as? Int
         if let teamScore = teamBScore {
             cell.teamTwoScore.text = "\(teamScore)"
         } else {
             cell.teamTwoScore.text = ""
         }
         
-        // Also if the score is being recorded then let's make it unselectable.
-        if teamAScore ?? 0 > 0 || teamBScore ?? 0 > 0 {
-            cell.selectionStyle = UITableViewCell.SelectionStyle.none
+        // Also if score is already recorded lets disable the row selection.
+        if (teamAScore ?? 0) > 0 || (teamBScore ?? 0) > 0 {
+            cell.selectionStyle = .none
+        } else {
+            cell.selectionStyle = .default
+        }
+        
+        // Let's udpate tournament status if its not yet udpated. We need to make the tournament completed if all the matches are scored now.
+        if !tournamentStatusUpdated && isAllMatchesScored() {
+            tournamentStatusUpdated = true
+            let tournamentRef = ref.child("groups/\(groupId!)/tournaments/\(tournamentId!)")
+            tournamentRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                var tournamentDict = snapshot.value as! Dictionary<String, Any>
+                tournamentDict[DatabaseFields.TournamentFields.status] = "Completed"
+                tournamentRef.setValue(tournamentDict)
+            })
         }
         return cell
     }

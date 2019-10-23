@@ -30,7 +30,6 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
     }
     
     func onGroupSelected() {
-        print("onGroupSelected")
         // Delegate method from ChooseGroupViewController.
         // Will fetch again.
         checkGroupSelected()
@@ -81,7 +80,6 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
                 })
                 if let matchedItem = matchedSnapshot {
                     if let index = self.tournaments.firstIndex(of: matchedItem) {
-                        print("index : \(index)")
                         self.tournaments[index] = tournamentSnapshot
                         self.tableView.reloadData()
                     }
@@ -95,7 +93,7 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
             // Get user value
             let value = snapshot.value as? NSDictionary
             let groupName = value?["name"] as? String ?? ""
-            //self.title = groupName
+            self.navigationItem.title = groupName
         })
     }
     

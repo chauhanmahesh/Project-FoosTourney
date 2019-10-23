@@ -109,7 +109,6 @@ extension ChooseGroupViewController: UICollectionViewDataSource {
         
         // Let's call the delegate method.
         if let delegate = self.delegate {
-            print("Calling delegate API")
             delegate.onGroupSelected()
         }
         dismiss(animated: true, completion: nil)

@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import Firebase
 
-class CreateGroupViewController: UIViewController {
+class CreateGroupViewController: UIViewController, UITextFieldDelegate{
     
     var ref: DatabaseReference!
     
@@ -26,7 +26,6 @@ class CreateGroupViewController: UIViewController {
             ref.child("members").queryOrdered(byChild: "id").queryEqual(toValue: userAuthenticatedId).observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists() {
                     let memberDict = snapshot.value as! Dictionary<String, Any>
-                    print("memberDict : \(memberDict)")
                     if let memberKey = memberDict.keys.first {
                         member[DatabaseFields.CommonFields.id] = memberKey
                         newGroupReference.child("members").childByAutoId().setValue(member)
@@ -38,6 +37,11 @@ class CreateGroupViewController: UIViewController {
         }
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
     @IBAction func cancelTapped() {
         // Let's dismiss.
         dismiss(animated: true, completion: nil)
@@ -45,6 +49,7 @@ class CreateGroupViewController: UIViewController {
     
     override func viewDidLoad() {
         configureDatabase()
+        groupNameTextField.delegate = self
     }
     
     func configureDatabase() {

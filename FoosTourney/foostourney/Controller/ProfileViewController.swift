@@ -58,7 +58,6 @@ class ProfileViewController: UIViewController {
                     // Let's get value.
                     let memberRefDict = snapshot.value as! Dictionary<String, Any>
                     let memberDict = memberRefDict[memberRefDict.keys.first!] as! Dictionary<String, Any>
-                    //print("MemberDict : \(memberDict[memberDict.keys.first!])")
                     self.totalMatches.text = "\(memberDict[DatabaseFields.MemberFields.totalMatchesPlayed] as? Int ?? 0)"
                     self.totalMatchesWon.text = "\(memberDict[DatabaseFields.MemberFields.totalMatchesWon] as? Int ?? 0)"
                     self.winPerct.text = "\(memberDict[DatabaseFields.MemberFields.totalWinPerct] as? Int ?? 0)"
