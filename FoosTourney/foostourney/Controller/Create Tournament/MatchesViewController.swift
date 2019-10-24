@@ -10,14 +10,16 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the list of matches generated from the teams passed to it.
 class MatchesViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
-    
+    // Holds the tournament information which will be used to create this tournament.
     var createTournament: CreateTournament!
+    // Dictionary to hold the name of all players against their snapshot id.
     var membersNameData: [String: String] = [:]
     
     @IBAction func startTournament() {
@@ -64,7 +66,6 @@ class MatchesViewController: UIViewController {
         
         
         // Let's write all the matches now.
-        
         for match in createTournament.matches {
             let matchRef = newTournamentRef.child("matches").childByAutoId()
             

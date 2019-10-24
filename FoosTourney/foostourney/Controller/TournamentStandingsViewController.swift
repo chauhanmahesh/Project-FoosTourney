@@ -10,22 +10,30 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the standings list for this particular tournament.
 class TournamentStandingsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
-    fileprivate var _childAddedRefHandle: DatabaseHandle!
-    var groupId: String!
-    var tournamentId: String!
-    var membersNameData: [String: String] = [:]
     
+    // Holds the groupdId where this tournament exists.
+    var groupId: String!
+    // Holds the tournamentId for which this standings is beingn displayed.
+    var tournamentId: String!
+    // Dictionary to hold the name of all players against their snapshot id.
+    var membersNameData: [String: String] = [:]
+    // Hold the team snapshots for which we are displaying this standings.
     var teams: [DataSnapshot]! = []
     
     override func viewDidLoad() {
-        activityIndicator.startAnimating()
         ref = Database.database().reference()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        activityIndicator.startAnimating()
         // Let's fetch member details (such as name) before populating any data. Because we don't want to fetch memberName asynchrously for each row. This could
         // mess up the tableview data.
         fetchMembersData(ref: ref, completion: { membersData in
@@ -36,6 +44,7 @@ class TournamentStandingsViewController: UIViewController {
         })
     }
     
+    // Observe changes in "/groups/tournaments/teams"
     func observeChanges() {
         ref.child("groups/\(groupId!)/tournaments/\(tournamentId!)/teams").queryOrdered(byChild: "points").observe(.childAdded) { (teamSnapshot: DataSnapshot) in
             if teamSnapshot.childrenCount > 0 {

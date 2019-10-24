@@ -9,10 +9,12 @@
 import UIKit
 import Firebase
 
+// DelegateProtocol which will be called whenever a group will be joined.
 protocol GroupJoinedDelegateProtocol {
     func onGroupJoined()
 }
 
+// UICollectionViewCell to hold the content of a single group cell.
 class GroupViewCell: UICollectionViewCell {
     
     @IBOutlet weak var groupBackground: UIImageView!

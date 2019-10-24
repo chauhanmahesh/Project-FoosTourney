@@ -9,12 +9,15 @@
 import UIKit
 import Foundation
 
+// ViewController which is responsible to display the details of a single tournament. This controller holds a segmented control which user can use to choose from two different views. "Matches" or "Standings" for the tournament.
 class TournamentDetailViewController: UIViewController {
     
     @IBOutlet var containerA: UIView!
     @IBOutlet var containerB: UIView!
     
+    // Holds the groupId from which this tournament belongs.
     var groupId: String!
+    // Holds the tournamentId for which we are displaying the details.
     var tournamentId: String!
     
     @IBAction func showComponent(_ sender: UISegmentedControl) {
@@ -29,10 +32,6 @@ class TournamentDetailViewController: UIViewController {
                 self.containerB.alpha = 1
             })
         }
-    }
-    
-    override func viewDidLoad() {
-        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

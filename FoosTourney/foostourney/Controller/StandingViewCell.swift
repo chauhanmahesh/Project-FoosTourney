@@ -8,6 +8,7 @@
 
 import UIKit
 
+// UITableViewCell to hold the content of a single standing cell.
 class StandingViewCell: UITableViewCell {
     
     @IBOutlet weak var teamOrPlayerName: UILabel!

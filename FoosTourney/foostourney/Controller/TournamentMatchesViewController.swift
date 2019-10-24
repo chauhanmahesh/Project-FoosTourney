@@ -10,18 +10,22 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the list of matches under a particular tournament.
 class TournamentMatchesViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
+    // Holds the groupId which this tournament belongs to.
     var groupId: String!
+    // Holds the tournamentId which this match list belongs to.
     var tournamentId: String!
-    
+    // Holds all the matche snapshots.
     var matches: [DataSnapshot]! = []
+    // Holds the selected match snapshot when user taps on any match.
     var selectedMatchSnapshot: DataSnapshot!
-    
+    // Dictionary to hold the name of all players against their snapshot id.
     var membersNameData: [String: String] = [:]
     
     // Keeping this to track whether we updated the tournament status or not. We don't want to update it all the time.
@@ -40,6 +44,7 @@ class TournamentMatchesViewController: UIViewController {
         })
     }
     
+    // Observe changes in "/groups/tournaments/matches"
     func observeChanges() {
         ref.child("groups/\(groupId!)/tournaments/\(tournamentId!)/matches").observe(.childAdded) { (matchSnapshot: DataSnapshot) in
             if matchSnapshot.childrenCount > 0 {

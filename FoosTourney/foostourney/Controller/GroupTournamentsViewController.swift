@@ -10,23 +10,21 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the  list of tournaments for the selected group with their current status i.e. "In Progress" or "Completed".
 class GroupTournamentsViewController: UIViewController, GroupSelectionDelegateProtocol {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var createTournament: UIBarButtonItem!
     
     var ref: DatabaseReference!
-    
+    // Holds the tournament snapshots for the selected group.
     var tournaments: [DataSnapshot]! = []
+    // Holds the currently selected group id.
     var currentSelectedGroupId: String?
     
     override func viewDidLoad() {
-        configureDatabase()
-        checkGroupSelected()
-    }
-    
-    func configureDatabase() {
         ref = Database.database().reference()
+        checkGroupSelected()
     }
     
     func onGroupSelected() {
@@ -37,6 +35,7 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
         tableView.reloadData()
     }
     
+    // Checks which group is currently selected. And if not then it display the viewController so that user can choose the group.
     func checkGroupSelected() {
         if let userGroupDict = UserDefaults.standard.dictionary(forKey: UserDefaultsKey.userGroupDict) {
             if let currentUserGroupSelected = userGroupDict[Auth.auth().currentUser?.uid ?? ""] {
@@ -58,6 +57,7 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
         }
     }
     
+    // Observe changes to "/groups/tournaments"
     func observeTournamentChanges() {
         ref.child("groups/\(currentSelectedGroupId!)/tournaments").observe(.childAdded) { (tournamentSnapshot: DataSnapshot) in
             if tournamentSnapshot.childrenCount > 0 {
@@ -88,6 +88,7 @@ class GroupTournamentsViewController: UIViewController, GroupSelectionDelegatePr
         }
     }
     
+    // Sets up the group name on the navigationBar as a title.
     func setupGroupName() {
         ref.child("groups/\(currentSelectedGroupId!)").observeSingleEvent(of: .value, with: { (snapshot) in
             // Get user value

@@ -11,6 +11,7 @@ import Firebase
 import FirebaseUI
 import FirebaseAuth
 
+// ViewController which is responsible to display the profile of the user.
 class ProfileViewController: UIViewController {
     
     @IBOutlet weak var profileImage: UIImageView!
@@ -23,7 +24,7 @@ class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         configureDatabase()
-        downloadProfileImaheAsync()
+        downloadProfileImageAsync()
         userName.text = Auth.auth().currentUser?.displayName ?? "No Name"
     }
     
@@ -36,7 +37,8 @@ class ProfileViewController: UIViewController {
         ref = Database.database().reference()
     }
     
-    func downloadProfileImaheAsync() {
+    // Downloads user's profile image if exists.
+    func downloadProfileImageAsync() {
         DispatchQueue.global(qos: .userInitiated).async { () -> Void in
             if let url = Auth.auth().currentUser?.photoURL, let imgData = try? Data(contentsOf: url), let img = UIImage(data: imgData) {
                 DispatchQueue.main.async() {
@@ -51,6 +53,7 @@ class ProfileViewController: UIViewController {
         }
     }
     
+    // Updates user stats on the view.
     func updateStats() {
         if let authenticatedUserid = Auth.auth().currentUser?.uid {
             ref.child("members").queryOrdered(byChild: "id").queryEqual(toValue: authenticatedUserid).observeSingleEvent(of: .value, with: { (snapshot) in

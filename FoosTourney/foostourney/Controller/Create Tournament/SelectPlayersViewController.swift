@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the list of players available in this group so that user can select which players should be part of this tournament.
 class SelectPlayersViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
@@ -19,9 +20,12 @@ class SelectPlayersViewController: UIViewController {
     
     var ref: DatabaseReference!
     
+    // Holds all the player snapshots.
     var playerIds: [DataSnapshot]! = []
     
+    // Holds the tournament information which will be used to create this tournament.
     var createTournament: CreateTournament!
+    // Dictionary to hold the name of all players against their snapshot id.
     var membersNameData: [String: String] = [:]
     
     @IBAction func onPrimaryAction() {
@@ -61,7 +65,7 @@ class SelectPlayersViewController: UIViewController {
             tableView.selectRow(at: IndexPath(row: row, section: 0), animated: true, scrollPosition: UITableView.ScrollPosition.none)
         }
         // If total items selected are at least two then only the tournament can be created.
-        primaryAction.isEnabled = totalRows >= 2
+        primaryAction.isEnabled = createTournament.tournamentType == .singles ? totalRows >= 2 : (totalRows >= 4 && totalRows % 2 == 0)
     }
     
     override func viewDidLoad() {
@@ -118,6 +122,7 @@ class SelectPlayersViewController: UIViewController {
         observeChanges()
     }
     
+    // Observing changes on '/members'
     func observeChanges() {
         ref.child("groups/\(createTournament.groupId!)/members").observe(.childAdded) { (memberSnapshot: DataSnapshot) in
             if memberSnapshot.childrenCount > 0 {

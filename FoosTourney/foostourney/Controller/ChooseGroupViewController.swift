@@ -10,16 +10,18 @@ import Foundation
 import UIKit
 import Firebase
 
+// DelegateProtocol which will be called when user will tap on any group to select it.
 protocol GroupSelectionDelegateProtocol {
     func onGroupSelected()
 }
 
+// ViewController which is responsible to display the collection of groups which user is part of.
 class ChooseGroupViewController: UIViewController {
     
     var ref: DatabaseReference!
-    
+    // Holds all the group snapshots which user is part of.
     var groups: [DataSnapshot]! = []
-    
+    // Delegate instance
     var delegate: GroupSelectionDelegateProtocol? = nil
     
     @IBOutlet var groupsCollectionView: UICollectionView!
@@ -34,6 +36,7 @@ class ChooseGroupViewController: UIViewController {
         observeChanges()
     }
     
+    // Observe the changes in '/groups'
     func observeChanges() {
         ref.child("groups").observe(.childAdded) { (snapshot: DataSnapshot) in
             let query = snapshot.childSnapshot(forPath: "/members").ref.queryOrdered(byChild: "authenticatedId").queryEqual(toValue: Auth.auth().currentUser?.uid)

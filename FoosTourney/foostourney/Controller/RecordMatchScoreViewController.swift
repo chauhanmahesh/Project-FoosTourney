@@ -11,13 +11,17 @@ import Firebase
 import FirebaseUI
 import FirebaseAuth
 
+// ViewController which is responsible to let user record the score for a particular match.
 class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
     let recordScorePickerData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    
+    // Holds the tournamentId where this match belongs to.
     var tournamentId: String!
+    // Holds the match snapshot for which the score is being recorded.
     var matchSnapshot: DataSnapshot!
+    // Holds the teamA snapshotId
     var teamASnapshotId: String!
+    // Holds the teamB snapshotId
     var teamBSnapshotId: String!
     var ref: DatabaseReference!
     
@@ -26,7 +30,7 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var teamAScorePicker: UIPickerView!
     @IBOutlet weak var teamBScorePicker: UIPickerView!
-    
+    // Dictionary to hold the name of all players against their snapshot id.
     var membersNameData: [String: String] = [:]
     
     @IBAction func cancelTapped() {
@@ -57,6 +61,7 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
         }
     }
     
+    // Record the match score.
     func recordMatchScore(_ teamAScore: Int, _ teamBScore: Int) {
         let matchTeamARef = matchSnapshot.ref.child("teams/\(teamASnapshotId!)")
         matchTeamARef.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -74,6 +79,7 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
         })
     }
     
+    // This record the team stats under /teams
     func recordTeamStats(_ groupId: String, _ teamAScore: Int, _ teamBScore: Int) {
         let didTeamAWon = teamAScore > teamBScore
         // Also let's update the team standings.
@@ -100,6 +106,7 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
         })
     }
     
+    // Record Player Stats under /players
     func recordPlayerStats(_ groupId: String, _ teamAScore: Int, _ teamBScore: Int) {
         let didTeamAWon = teamAScore > teamBScore
         
@@ -125,6 +132,7 @@ class RecordMatchScoreViewController: UIViewController, UIPickerViewDataSource, 
         
     }
     
+    // Updates the playerStats for the passed playerId.
     func updatePlayerStats(ofPlayerId: String, didWon: Bool) {
         let memberRef = ref.child("members/\(ofPlayerId)")
         memberRef.observeSingleEvent(of: .value, with: { (snapshot) in

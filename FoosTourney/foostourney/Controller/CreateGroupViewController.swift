@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display field to enter the group name as per Group creation process.
 class CreateGroupViewController: UIViewController, UITextFieldDelegate{
     
     var ref: DatabaseReference!
@@ -48,12 +49,8 @@ class CreateGroupViewController: UIViewController, UITextFieldDelegate{
     }
     
     override func viewDidLoad() {
-        configureDatabase()
-        groupNameTextField.delegate = self
-    }
-    
-    func configureDatabase() {
         ref = Database.database().reference()
+        groupNameTextField.delegate = self
     }
     
 }

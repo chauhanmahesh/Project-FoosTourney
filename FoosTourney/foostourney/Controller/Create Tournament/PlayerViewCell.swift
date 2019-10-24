@@ -8,6 +8,7 @@
 
 import UIKit
 
+// UITableViewCell to hold the content of a single player cell on SelectPlayersViewController.
 class PlayerViewCell: UITableViewCell {
 
     @IBOutlet weak var name: UILabel!

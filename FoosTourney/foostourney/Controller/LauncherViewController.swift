@@ -11,6 +11,11 @@ import Firebase
 import FirebaseUI
 import FirebaseAuth
 
+// ViewController which is responsible to decide which ViewController to launch when the app starts.
+// There are three cases:
+// 1. If user never logged in, then display the viewController which will be used to login. (FirebaseAuth handles that view)
+// 2. If the user is logged in but never choosen a group on this device then launch 'ChooseGroupViewController'
+// 3. If the user is logged in and a group is already choosen then launch 'DashboardViewController'
 class LauncherViewController: UIViewController {
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -53,6 +58,7 @@ class LauncherViewController: UIViewController {
         })
     }
     
+    // Launches the dashboard.
     func showDashboard() {
         activityIndicator.stopAnimating()
         let newViewController = self.storyboard?.instantiateViewController(withIdentifier: "dashboardViewController")
@@ -60,6 +66,7 @@ class LauncherViewController: UIViewController {
         appDelegate.window?.rootViewController = newViewController
     }
     
+    // Saves authenticated user information in the Firebase database.
     func saveUser(_ user: User) {
         var member = [DatabaseFields.CommonFields.id: user.uid]
         member[DatabaseFields.CommonFields.name] = user.displayName ?? ""

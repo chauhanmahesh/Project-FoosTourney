@@ -10,8 +10,15 @@ import Foundation
 import Firebase
 import Fakery
 
+// Utility class to hold any function which can be used statically from anywhere within the app.
 class GenericUtility {
     
+    // Generates the team (Randomly) based on the players passed.
+    // - Parameters:
+    //      - allPlayerSnapshots: All players snapshot within that group.
+    //      - selectedIndexs: Array of index for the selected players from the list.
+    // - Returns: Array of randomly generated [Team]
+    //
     // Returned teams will of this form.
     // [[Player, Player], [Player, Player].....]
     class func generateTeams(allPlayerSnapshots: [DataSnapshot], selectedIndexs: [Int]) -> [Team] {
@@ -39,6 +46,11 @@ class GenericUtility {
         return teams
     }
     
+    // Generates the matches (Randomly) based on the teams passed.
+    // - Parameters:
+    //      - allTeams: Array of teams which will be in the matches.
+    // - Returns: Array of randomly generated [Match]
+    //
     // Returned matches will look like.
     // If tournament type is doubles then matches will look like ->
     // [
@@ -92,8 +104,11 @@ class GenericUtility {
         return matches
     }
     
+    // Gives a random teamName (Using Fakery to generate random name).
+    // - Parameters:
+    //      - existingTeamNames: List of team names already generated.
+    // - Returns: Team name generated which doesn't exist in 'existingTeamNames'
     class func randomTeamName(existingTeamNames: [String]) -> String {
-        
         let faker = Faker(locale: "en-AU")
         var teamName: String
         repeat {
@@ -104,7 +119,6 @@ class GenericUtility {
             }
         } while existingTeamNames.contains(teamName)
         return teamName
-        
     }
 
 }

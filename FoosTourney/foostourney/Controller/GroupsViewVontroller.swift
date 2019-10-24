@@ -10,10 +10,11 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the list of searched groups and also the search bar which will be used to search the groups which user is still not part of.
 class GroupsViewController: UIViewController {
     
     var ref: DatabaseReference!
-    
+    // Holds all the group snapshots which is being searched.
     var groups: [DataSnapshot]! = []
     
     @IBOutlet var groupsCollectionView: UICollectionView!
@@ -25,10 +26,6 @@ class GroupsViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        configureDatabase()
-    }
-    
-    func configureDatabase() {
         ref = Database.database().reference()
     }
     
@@ -121,6 +118,7 @@ extension GroupsViewController: UICollectionViewDelegateFlowLayout {
 
 extension GroupsViewController: GroupJoinedDelegateProtocol {
 
+    // Delegate method which will be called when user will join a group.
     func onGroupJoined() {
         updateResultsForSearchText(text: searchBar.text ?? "")
     }

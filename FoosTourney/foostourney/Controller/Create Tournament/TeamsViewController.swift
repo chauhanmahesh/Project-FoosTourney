@@ -10,14 +10,16 @@ import Foundation
 import UIKit
 import Firebase
 
+// ViewController which is responsible to display the list of teams generated from the selected players.
 class TeamsViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var ref: DatabaseReference!
-    
+    // Holds the tournament information which will be used to create this tournament.
     var createTournament: CreateTournament!
+    // Dictionary to hold the name of all players against their snapshot id.
     var membersNameData: [String: String] = [:]
     
     @IBAction func onPrimaryAction() {
@@ -39,12 +41,10 @@ class TeamsViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
         if segue.identifier == "generateDoublesMatches" {
             let matchesVC = segue.destination as! MatchesViewController
             matchesVC.createTournament = createTournament
         }
-        
     }
     
 }

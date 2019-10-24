@@ -8,6 +8,7 @@
 
 import UIKit
 
+// UITableViewCell to hold the content of a single team cell on MatchesViewController.
 class MatchViewCell: UITableViewCell {
 
     @IBOutlet weak var teamOne: UILabel!

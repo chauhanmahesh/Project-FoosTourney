@@ -8,6 +8,7 @@
 
 import UIKit
 
+// UITableViewCell to hold the content of a single tournament cell.
 class TournamentViewCell: UITableViewCell {
 
     @IBOutlet weak var name: UILabel!
